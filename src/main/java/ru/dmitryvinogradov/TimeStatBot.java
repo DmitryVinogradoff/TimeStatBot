@@ -21,7 +21,7 @@ public class TimeStatBot extends TelegramLongPollingBot {
             }
         } else if (update.hasCallbackQuery()) {
             try {
-                new CallbackQueryHandler().callbackMessage(update.getMessage());
+                new CallbackQueryHandler().callbackMessage(update.getCallbackQuery());
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
