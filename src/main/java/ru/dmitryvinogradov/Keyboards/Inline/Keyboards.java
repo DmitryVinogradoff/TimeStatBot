@@ -13,10 +13,22 @@ public class Keyboards {
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 
-    public static List<List<InlineKeyboardButton>> getManageTaskKeyboard(){
+    public static List<List<InlineKeyboardButton>> getManageTasksKeyboard(){
         //сюда данные будт приходить из базы
         String[] captionOnButton = new String[] {"Отслеживание задач", "Добавить задачу", "Удалить задачу", "Назад"};
         String[] callbackOnButton = new String[] {"tracking_task", "add_task_menu", "delete_task_menu", "start_menu"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getBackToManageTasksKeyboard(){
+        String[] captionOnButton = new String[] {"Назад"};
+        String[] callbackOnButton = new String[] {"tasks"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+    //метод для клавиатуры возврата из добавления задач
+    public static List<List<InlineKeyboardButton>> getBackToManageTasksKeyboard(String text){
+        String[] captionOnButton = new String[] {text};
+        String[] callbackOnButton = new String[] {"tasks"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 
