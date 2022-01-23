@@ -23,6 +23,6 @@
 hs_err_pid*
 
 .idea
-CodeWars.iml
 src/main/java/ru/dmitryvinogradov/BotConfig.java
 /target/site-webapp/WEB-INF/web.xml
+src/main/resources/hibernate.cfg.xml
