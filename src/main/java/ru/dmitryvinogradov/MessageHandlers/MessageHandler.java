@@ -41,7 +41,7 @@ public class MessageHandler {
                 BOT.execute(SendMessage
                             .builder()
                             .text(stringBuilder.toString())
-                            .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getStartKeyboard()).build())
+                            .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getStartMenuKeyboard()).build())
                             .chatId(message.getChatId().toString())
                             .build()
                     );

@@ -30,7 +30,7 @@ public class CallbackQueryHandler {
                                 .replyMarkup(
                                         InlineKeyboardMarkup
                                                 .builder()
-                                                .keyboard(Keyboards.getStartKeyboard())
+                                                .keyboard(Keyboards.getStartMenuKeyboard())
                                                 .build()
                                 )
                                 .chatId(cbQ.getMessage().getChatId().toString())
@@ -40,6 +40,7 @@ public class CallbackQueryHandler {
                 BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
+
             case "tasks": {
                 BOT.execute(
                         EditMessageText
@@ -65,6 +66,36 @@ public class CallbackQueryHandler {
                 );
 
                 BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());//убираем "часики"
+                break;
+            }
+            case "stats_tasks":{
+                if(false){//запрос в базу, какие задачи, и инлайн клавиатура с ними
+
+                } else {
+                    BOT.execute(
+                            EditMessageText
+                                    .builder()
+                                    .text("У Вас пока нет статистики по задачам")
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build());
+                    BOT.execute(
+                            EditMessageReplyMarkup
+                                    .builder()
+                                    .replyMarkup(
+                                            InlineKeyboardMarkup
+                                                    .builder()
+                                                    .keyboard(Keyboards.getBackToStartMenuKeyboard())
+                                                    .build())
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build()
+                    );
+                    BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+                }
+                break;
+            }
+            case "about":{
                 break;
             }
 
@@ -150,6 +181,7 @@ public class CallbackQueryHandler {
                 BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
+
 
         }
     }
