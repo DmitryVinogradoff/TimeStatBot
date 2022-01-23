@@ -1,13 +1,12 @@
 package ru.dmitryvinogradov.Keyboards.Inline;
 
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Keyboards {
-    public static List<List<InlineKeyboardButton>> getStartKeyboard(){
+    public static List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
         String[] captionOnButton = new String[] {"Мои задачи", "Статистика", "О боте"};
         String[] callbackOnButton = new String[] {"tasks", "stats_tasks", "about"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
@@ -17,6 +16,12 @@ public class Keyboards {
         //сюда данные будт приходить из базы
         String[] captionOnButton = new String[] {"Отслеживание задач", "Добавить задачу", "Удалить задачу", "Назад"};
         String[] callbackOnButton = new String[] {"tracking_task", "add_task_menu", "delete_task_menu", "start_menu"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getBackToStartMenuKeyboard(){
+        String[] captionOnButton = new String[] {"Назад"};
+        String[] callbackOnButton = new String[] {"start_menu"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 
