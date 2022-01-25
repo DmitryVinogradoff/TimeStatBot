@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
+import ru.dmitryvinogradov.Models.ListOfTasks;
+import ru.dmitryvinogradov.Services.ListOfTasksService;
 
 import java.util.Optional;
 
@@ -50,13 +52,18 @@ public class MessageHandler {
     }
 
     private void messageManager (String text) throws TelegramApiException {
+        //TODO сделать проверку
+        ListOfTasks task = new ListOfTasks(text, Math.toIntExact(message.getFrom().getId()));
+        ListOfTasksService listOfTasksService = new ListOfTasksService();
+        listOfTasksService.saveListOfTasks(task);
+
         BOT.execute(
                 SendMessage
                 .builder()
                 .text("Задача " + text + " успешно добавлена")
                 .chatId(message.getChatId().toString())
                         //TODO Добавить кнопку начать отслеживание добавленной задачи сейчас
-                .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getBackToManageTasksKeyboard("Мои задачи")).build())
+                .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getBackToManageTasksKeyboard("Управление задачами")).build())
                 .build()
         );
     }
