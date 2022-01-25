@@ -1,6 +1,7 @@
 package ru.dmitryvinogradov.Keyboards.Inline;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.dmitryvinogradov.Models.ListOfTasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,22 @@ public class Keyboards {
         String[] captionOnButton = new String[] {text};
         String[] callbackOnButton = new String[] {"tasks"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getAllTasksKeyboard(String type, List<ListOfTasks> tasks){
+        int count = tasks.size();
+        int i = 0;
+        //TODO в зависимости от числа задач раскидать число кнопок
+        String[] captionOnButton = new String[count + 1];
+        String[] callbackOnButton = new String[count + 1];
+        for(ListOfTasks task : tasks){
+            captionOnButton[i] = task.getName();
+            callbackOnButton[i] = type + ":" + task.getId();
+            i++;
+        }
+        captionOnButton[i] = "Назад";
+        callbackOnButton[i] = "tasks";
+        return keyboardGenerator(2, captionOnButton, callbackOnButton);
     }
 
     private static List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine, String[] captionOnButton, String[] callbackOnButton){

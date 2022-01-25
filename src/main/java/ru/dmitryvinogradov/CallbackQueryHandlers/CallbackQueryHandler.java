@@ -7,6 +7,11 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
+import ru.dmitryvinogradov.Services.ListOfTasksService;
+import ru.dmitryvinogradov.Services.UsersService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static ru.dmitryvinogradov.GlobalConfig.BOT;
 
@@ -15,6 +20,7 @@ public class CallbackQueryHandler {
     public void callbackMessage(CallbackQuery cbQ) throws TelegramApiException {
         this.callbackQuery = cbQ;
         String callback = callbackQuery.getData();
+        //TODO вынести answer callback
         switch (callback){
             case "start_menu": {
                 BOT.execute(
@@ -100,8 +106,33 @@ public class CallbackQueryHandler {
             }
 
             case "tracking_task":{
-                if(false){ //запрос в базу, есть ли задачи
+                List listOfTasks = new ArrayList();
+                ListOfTasksService listOfTasksService = new ListOfTasksService();
+                //TODO перейти на Long
+                listOfTasks = listOfTasksService.findByIdUserTelegram(Math.toIntExact(cbQ.getFrom().getId()));
+                if(!listOfTasks.isEmpty()){ //запрос в базу, есть ли задачи
                     //если есть тут сообщение и задачи кнопками инлайн
+                    BOT.execute(
+                            EditMessageText
+                                    .builder()
+                                    .text("Ваши задачи для отслеживания")
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build()
+                    );
+
+                    BOT.execute(
+                            EditMessageReplyMarkup
+                                    .builder()
+                                    .replyMarkup(
+                                            InlineKeyboardMarkup
+                                                    .builder()
+                                                    .keyboard(Keyboards.getAllTasksKeyboard( "tracking", listOfTasks))
+                                                    .build())
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build()
+                    );
                 } else {
                     BOT.execute(
                             EditMessageText
@@ -181,7 +212,6 @@ public class CallbackQueryHandler {
                 BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
-
 
         }
     }
