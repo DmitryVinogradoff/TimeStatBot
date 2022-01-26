@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.dmitryvinogradov.Models.Tasks;
+import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.Models.Users;
 
 
@@ -16,8 +17,8 @@ public class HibernateSessionFactoryUtil {
         if(sessionFactory == null){
             try{
                 Configuration configuration = new Configuration().configure();
-                configuration.addAnnotatedClass(Users.class);
                 configuration.addAnnotatedClass(Tasks.class);
+                configuration.addAnnotatedClass(TimeTable.class);
                 StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(builder.build());
             } catch (Exception e) {
