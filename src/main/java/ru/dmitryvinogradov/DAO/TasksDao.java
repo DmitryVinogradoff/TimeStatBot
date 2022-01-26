@@ -3,52 +3,54 @@ package ru.dmitryvinogradov.DAO;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import ru.dmitryvinogradov.Models.ListOfTasks;
-import ru.dmitryvinogradov.Models.Users;
+import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.utils.HibernateSessionFactoryUtil;
 
 import java.util.List;
 
-public class ListOfTasksDao {
-    public ListOfTasks findById(int id){
+public class TasksDao {
+    public Tasks findById(long id){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        ListOfTasks listOfTasks = session.get(ListOfTasks.class, id);
+        Tasks tasks = session.get(Tasks.class, id);
         session.close();
-        return listOfTasks;
+        return tasks;
     }
 
-    public void save(ListOfTasks listOfTasks){
+    public void save(Tasks tasks){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.save(listOfTasks);
+        session.save(tasks);
         transaction.commit();
         session.close();
     }
 
-    public void update(ListOfTasks listOfTasks){
+    public void update(Tasks tasks){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.update(listOfTasks);
+        session.update(tasks);
         transaction.commit();
         session.close();
     }
 
-    public void delete(ListOfTasks listOfTasks){
+      public void delete(long id){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.delete(listOfTasks);
+        Query query =
+                  session.createQuery("DELETE FROM Tasks WHERE id = :id")
+                          .setParameter("id", id);
+        query.executeUpdate();
         transaction.commit();
         session.close();
     }
 
-    public List<ListOfTasks> findByIdUserTelegram(int idUserTelegram){
+    public List<Tasks> findByIdUserTelegram(long idUserTelegram){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Query query =
-                session.createQuery("FROM ListOfTasks WHERE idUserTelegram = :idUserTelegram")
+                session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
                         .setParameter("idUserTelegram", idUserTelegram);
 
-        List<ListOfTasks> listOfTasks = query.list();
+        List<Tasks> tasks = query.list();
         session.close();
-        return listOfTasks;
+        return tasks;
     }
 }

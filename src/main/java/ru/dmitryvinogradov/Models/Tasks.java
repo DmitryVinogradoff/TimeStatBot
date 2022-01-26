@@ -3,19 +3,19 @@ package ru.dmitryvinogradov.Models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "list_of_tasks")
-public class ListOfTasks {
+@Table(name = "tasks")
+public class Tasks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column (name = "name")
     private String name;
 
     @Column (name = "id_user_telegram")
-    private int idUserTelegram;
+    private long idUserTelegram;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -35,10 +35,10 @@ public class ListOfTasks {
         this.idUserTelegram = idUserTelegram;
     }
 
-    public ListOfTasks() {
+    public Tasks() {
     }
 
-    public ListOfTasks(String name, int idUserTelegram) {
+    public Tasks(String name, int idUserTelegram) {
         this.id = id;
         this.name = name;
         this.idUserTelegram = idUserTelegram;
