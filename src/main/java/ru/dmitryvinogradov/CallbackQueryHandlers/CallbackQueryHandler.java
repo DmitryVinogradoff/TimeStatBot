@@ -6,10 +6,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.dmitryvinogradov.DAO.TimeTableDao;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
 import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.Services.TasksService;
+import ru.dmitryvinogradov.Services.TimeTableService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -46,7 +46,7 @@ public class CallbackQueryHandler {
                                 .messageId(cbQ.getMessage().getMessageId())
                                 .build()
                 );
-                BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+              //  BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
 
@@ -74,7 +74,7 @@ public class CallbackQueryHandler {
                                 .build()
                 );
 
-                BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());//убираем "часики"
+              //  BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());//убираем "часики"
                 break;
             }
             case "stats_tasks":{
@@ -100,16 +100,11 @@ public class CallbackQueryHandler {
                                     .messageId(cbQ.getMessage().getMessageId())
                                     .build()
                     );
-                    BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+                   // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 }
                 break;
             }
             case "about":{
-//TODO https://stackoverflow.com/questions/6627289/what-is-the-most-recommended-way-to-store-time-in-postgresql-using-java
-                Timestamp timestamp = Timestamp.from(Instant.now());
-                TimeTable timeTable = new TimeTable(5, timestamp, true);
-                TimeTableDao timeTableDao = new TimeTableDao();
-                timeTableDao.save(timeTable);
                 break;
             }
 
@@ -117,8 +112,7 @@ public class CallbackQueryHandler {
                 List tasks = new ArrayList();
                 TasksService tasksService = new TasksService();
                 tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
-                if(!tasks.isEmpty()){ //запрос в базу, есть ли задачи
-                    //если есть тут сообщение и задачи кнопками инлайн
+                if(!tasks.isEmpty()){
                     BOT.execute(
                             EditMessageText
                                     .builder()
@@ -163,7 +157,7 @@ public class CallbackQueryHandler {
                                     .build()
                     );
                 }
-                BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+               // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
             case "add_task_menu": {
@@ -187,7 +181,7 @@ public class CallbackQueryHandler {
                                 .messageId(cbQ.getMessage().getMessageId())
                                 .build()
                 );
-                BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+               // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
             case "delete_task_menu":{
@@ -245,12 +239,32 @@ public class CallbackQueryHandler {
             }
 
             case "tracking":{
+                //TODO https://stackoverflow.com/questions/6627289/what-is-the-most-recommended-way-to-store-time-in-postgresql-using-java
+                TimeTableService timeTableService = new TimeTableService();
+                long id = timeTableService.startTask(Integer.parseInt(callback[1]), Timestamp.from(Instant.now()));
+                StringBuilder sb = new StringBuilder();
+                sb.append("Начато отслеживание задачи <b><i>").append(callback[2]).append("</i></b>");
                 BOT.execute(EditMessageText
                         .builder()
                         .chatId(cbQ.getMessage().getChatId().toString())
                         .messageId(cbQ.getMessage().getMessageId())
-                        .text("Начато отслеживание задачи: ")
+                        .text(sb.toString()).parseMode("HTML")
                         .build());
+                sb.setLength(0);
+                sb.append("stop:").append(id).append(":").append(callback[2]);
+                BOT.execute(
+                        EditMessageReplyMarkup
+                                .builder()
+                                .chatId(cbQ.getMessage().getChatId().toString())
+                                .messageId(cbQ.getMessage().getMessageId())
+                                .replyMarkup(
+                                        InlineKeyboardMarkup
+                                                .builder()
+                                                .keyboard(Keyboards.getStopTasksKeyboard("Остановить отслеживание", sb.toString()))
+                                                .build()
+                                )
+                                .build()
+                );
                 break;
             }
             case "delete":{
@@ -277,7 +291,32 @@ public class CallbackQueryHandler {
                                 .build());
                 break;
             }
-
+            case "stop":{
+                TimeTableService timeTableService = new TimeTableService();
+                timeTableService.stopTask(Integer.parseInt(callback[1]), Timestamp.from(Instant.now()));
+                StringBuilder sb = new StringBuilder();
+                sb.append("Отслеживание задачи <b><i>").append(callback[2]).append("</i></b> завершено");
+                BOT.execute(EditMessageText
+                        .builder()
+                        .chatId(cbQ.getMessage().getChatId().toString())
+                        .messageId(cbQ.getMessage().getMessageId())
+                        .text(sb.toString()).parseMode("HTML")
+                        .build());
+                BOT.execute(
+                        EditMessageReplyMarkup
+                                .builder()
+                                .replyMarkup(
+                                        InlineKeyboardMarkup
+                                                .builder()
+                                                .keyboard(Keyboards.getBackToManageTasksKeyboard("Мои задачи"))
+                                                .build())
+                                .chatId(cbQ.getMessage().getChatId().toString())
+                                .messageId(cbQ.getMessage().getMessageId())
+                                .build()
+                );
+                break;
+            }
         }
+        BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
     }
 }

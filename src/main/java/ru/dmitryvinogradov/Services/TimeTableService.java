@@ -1,10 +1,9 @@
 package ru.dmitryvinogradov.Services;
 
 import ru.dmitryvinogradov.DAO.TimeTableDao;
-import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
 
-import java.util.List;
+import java.sql.Timestamp;
 
 public class TimeTableService {
     public TimeTableService() {
@@ -16,13 +15,21 @@ public class TimeTableService {
         return timeTableDao.findById(id);
     }
 
-    public void saveTimeTable(TimeTable timeTable){
-        timeTableDao.save(timeTable);
+    public long startTask(long idTask, Timestamp statedAt){
+        TimeTable timeTable = new TimeTable(idTask, statedAt, true);
+        long id = timeTableDao.save(timeTable);
+        return id;
     }
 
-    public void updateTimeTable(TimeTable timeTable){
+    public long stopTask(long id, Timestamp stoppedAt){
+        TimeTable timeTable = timeTableDao.findById(id);
+        timeTable.setStoppedAt(stoppedAt);
+        timeTable.setStatus(false);
         timeTableDao.update(timeTable);
+        return id;
     }
+
+    public void updateTimeTable(TimeTable timeTable){ timeTableDao.update(timeTable); }
 
     public void deleteTimeTable(long id){
         timeTableDao.delete(id);

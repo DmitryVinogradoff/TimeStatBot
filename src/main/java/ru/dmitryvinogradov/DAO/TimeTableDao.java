@@ -7,6 +7,8 @@ import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.utils.HibernateSessionFactoryUtil;
 
+import java.util.List;
+
 public class TimeTableDao {
     public TimeTable findById(long id){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
@@ -15,12 +17,13 @@ public class TimeTableDao {
         return timeTable;
     }
     //TODO попробовать убрать дублирование кода и эти функции вынести в общий файл
-    public void save(TimeTable timeTable){
+    public long save(TimeTable timeTable){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.save(timeTable);
+        long id = (long) session.save(timeTable);
         transaction.commit();
         session.close();
+        return id;
     }
 
     public void update(TimeTable timeTable){

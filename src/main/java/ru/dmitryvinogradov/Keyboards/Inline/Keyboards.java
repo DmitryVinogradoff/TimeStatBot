@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Keyboards {
     public static List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
-        String[] captionOnButton = new String[] {"Мои задачи", "Статистика", "О боте"};
+        String[] captionOnButton = new String[] {"Управление задачами", "Статистика", "О боте"};
         String[] callbackOnButton = new String[] {"tasks", "stats_tasks", "about"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
@@ -38,16 +38,25 @@ public class Keyboards {
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 
+    public static List<List<InlineKeyboardButton>> getStopTasksKeyboard(String text, String callback){
+        String[] captionOnButton = new String[] {text};
+        String[] callbackOnButton = new String[] {callback};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
     public static List<List<InlineKeyboardButton>> getAllTasksKeyboard(String type, List<Tasks> tasks){
         int count = tasks.size();
         int i = 0;
         //TODO в зависимости от числа задач раскидать число кнопок и сделать кнопку назад одной строкой
         String[] captionOnButton = new String[count + 1];
         String[] callbackOnButton = new String[count + 1];
+        StringBuilder sb = new StringBuilder();
         for(Tasks task : tasks){
             captionOnButton[i] = task.getName();
-            callbackOnButton[i] = type + ":" + task.getId();
+            sb.append(type).append(":").append(task.getId()).append(":").append(task.getName());
+            callbackOnButton[i] = sb.toString();
             i++;
+            sb.setLength(0);
         }
         captionOnButton[i] = "Назад";
         callbackOnButton[i] = "tasks";
