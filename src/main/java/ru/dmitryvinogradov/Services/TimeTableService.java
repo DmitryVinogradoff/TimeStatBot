@@ -19,8 +19,7 @@ public class TimeTableService {
 
     public long startTask(long idTask, Timestamp statedAt){
         TimeTable timeTable = new TimeTable(idTask, statedAt, true);
-        long id = timeTableDao.save(timeTable);
-        return id;
+        return timeTableDao.save(timeTable);
     }
 
     public long stopTask(long id, Timestamp stoppedAt){

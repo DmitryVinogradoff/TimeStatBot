@@ -20,135 +20,34 @@ import java.util.List;
 import static ru.dmitryvinogradov.GlobalConfig.BOT;
 
 public class CallbackQueryHandler {
-    private CallbackQuery callbackQuery;
     public void callbackMessage(CallbackQuery cbQ) throws TelegramApiException {
-        this.callbackQuery = cbQ;
-        String[] callback = callbackQuery.getData().split(":");
+        String[] callback = cbQ.getData().split(":");
         //TODO вынести answer callback
+        String chatId = cbQ.getMessage().getChatId().toString();
+        Integer messageId = cbQ.getMessage().getMessageId();
+        String messageText = "";
+        List<List<InlineKeyboardButton>>  keyboard = new ArrayList<>();
         switch (callback[0]){
             case "start_menu": {
-                BOT.execute(
-                        EditMessageText
-                                .builder()
-                                .text("Данный бот предназначен для учета и анализа времени, потраченного на какие-либо задачи.")
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build());
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .replyMarkup(
-                                        InlineKeyboardMarkup
-                                                .builder()
-                                                .keyboard(Keyboards.getStartMenuKeyboard())
-                                                .build()
-                                )
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build()
-                );
+                messageText = "Данный бот предназначен для учета и анализа времени, потраченного на какие-либо задачи.";
+                keyboard = Keyboards.getStartMenuKeyboard();
                 break;
             }
 
-            case "period_of_stats": {
-                TasksService tasksService = new TasksService();
-                List<Tasks> tasks = tasksService.findAll(cbQ.getFrom().getId());
-                TimeTableService timeTableService = new TimeTableService();
-                StringBuilder sb = new StringBuilder();
-                if(!tasks.isEmpty()) {
-                    for (Tasks task : tasks) {
-                        String taskStat = timeTableService.taskStat(task.getId(), callback[1]);
-                        if ((taskStat != null)) {
-                            sb.append("На <b><i>").append(task.getName()).append("</i></b> потрачено ");
-                            sb.append(taskStat);
-                            sb.append("\n");
-                        }
-                    }
-                    String messageText = sb.toString();
-                    if (messageText.isBlank()) {
-                        messageText = "У Вас нет статистики за этот период";
-                    }
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text(messageText)
-                                    .parseMode("HTML")
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build());
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(Keyboards.getBackToStatsTasksKeyboard())
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
-                    break;
-                }
-            }
-
             case "tasks": {
-                BOT.execute(
-                        EditMessageText
-                                .builder()
-                                .text("Меню управления задачами")
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build()
-                );
-
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .replyMarkup(
-                                    InlineKeyboardMarkup
-                                    .builder()
-                                    .keyboard(Keyboards.getManageTasksKeyboard())
-                                    .build()
-                                )
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build()
-                );
+                messageText = "Меню управления задачами";
+                keyboard = Keyboards.getManageTasksKeyboard();
                 break;
             }
             case "stats_tasks":{
                 TasksService tasksService = new TasksService();
                 List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
-                String messageText;
-                List<List<InlineKeyboardButton>>  keyboard;
                 if(!tasks.isEmpty()){
                     messageText = "Выберете период, за который Вы хотет просмотреть статистику";
                     keyboard = Keyboards.getChoicePeriodStatsKeyboard();
                 } else {
                     messageText = "У Вас пока нет статистики по задачам";
                     keyboard = Keyboards.getBackToStartMenuKeyboard();
-                }
-                {
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text(messageText)
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build());
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(keyboard)
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
                 }
                 break;
             }
@@ -157,133 +56,57 @@ public class CallbackQueryHandler {
             }
 
             case "tracking_task":{
-                List tasks = new ArrayList();
                 TasksService tasksService = new TasksService();
-                tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
+                List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
                 if(!tasks.isEmpty()){
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text("Ваши задачи для отслеживания")
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
-
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(Keyboards.getAllTasksKeyboard( "tracking", tasks))
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
+                    messageText = "Ваши задачи для отслеживания";
+                    keyboard = Keyboards.getAllTasksKeyboard( "tracking", tasks);
                 } else {
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text("У Вас нет задач на отслеживание.\nДобавьте их в меню управлениями задачами, нажав \"Добавить задачу\"")
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
-
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(Keyboards.getBackToManageTasksKeyboard())
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
+                    messageText = "У Вас нет задач на отслеживание.\nДобавьте их в меню управлениями задачами, нажав \"Добавить задачу\"";
+                    keyboard = Keyboards.getBackToManageTasksKeyboard();
                 }
-               // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
             }
             case "add_task_menu": {
-                BOT.execute(
-                        EditMessageText
-                                .builder()
-                                .text("Добавьте задачу, прислав боту сообщение с ее названием")
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build());
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .replyMarkup(
-                                    InlineKeyboardMarkup
-                                            .builder()
-                                            .keyboard(Keyboards.getBackToManageTasksKeyboard())
-                                            .build()
-                                )
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build()
-                );
-               // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+                messageText = "Добавьте задачу, прислав боту сообщение с ее названием";
+                keyboard = Keyboards.getBackToManageTasksKeyboard();
                 break;
             }
             case "delete_task_menu":{
-                List tasks = new ArrayList();
                 TasksService tasksService = new TasksService();
-                tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
-                if(!tasks.isEmpty()){ //запрос в базу, есть ли задачи
-                    //если есть тут сообщение и задачи кнопками инлайн
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text("Для удаления задачи из списка доступных на отслеживание, нажимите на кнопку с названием задачи")
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
-
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(Keyboards.getAllTasksKeyboard( "delete", tasks))
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
+                List<Tasks> tasks =  tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
+                if(!tasks.isEmpty()){
+                    messageText = "Для удаления задачи из списка доступных на отслеживание, нажимите на кнопку с названием задачи";
+                    keyboard = Keyboards.getAllTasksKeyboard( "delete", tasks);
                 } else {
-                    BOT.execute(
-                            EditMessageText
-                                    .builder()
-                                    .text("У Вас нет задач, которые можно удалить")
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
-
-                    BOT.execute(
-                            EditMessageReplyMarkup
-                                    .builder()
-                                    .replyMarkup(
-                                            InlineKeyboardMarkup
-                                                    .builder()
-                                                    .keyboard(Keyboards.getBackToManageTasksKeyboard())
-                                                    .build())
-                                    .chatId(cbQ.getMessage().getChatId().toString())
-                                    .messageId(cbQ.getMessage().getMessageId())
-                                    .build()
-                    );
+                    messageText = "У Вас нет задач, которые можно удалить";
+                    keyboard = Keyboards.getBackToManageTasksKeyboard();
                 }
-                BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
+
                 break;
+            }
+
+            case "period_of_stats": {
+                TasksService tasksService = new TasksService();
+                List<Tasks> tasks = tasksService.findAll(cbQ.getFrom().getId());
+                if(!tasks.isEmpty()) {
+                    TimeTableService timeTableService = new TimeTableService();
+                    StringBuilder sb = new StringBuilder();
+                    for (Tasks task : tasks) {
+                        String taskStat = timeTableService.taskStat(task.getId(), callback[1]);
+                        if ((taskStat != null)) {
+                            sb.append("На <b><i>").append(task.getName()).append("</i></b> потрачено ");
+                            sb.append(taskStat);
+                            sb.append("\n");
+                        }
+                    }
+                    messageText = sb.toString();
+                    keyboard = Keyboards.getBackToStatsTasksKeyboard();
+                    if (messageText.isBlank()) {
+                        messageText = "У Вас нет статистики за этот период";
+                    }
+                    break;
+                }
             }
 
             case "tracking":{
@@ -292,51 +115,19 @@ public class CallbackQueryHandler {
                 long id = timeTableService.startTask(Integer.parseInt(callback[1]), Timestamp.from(Instant.now()));
                 StringBuilder sb = new StringBuilder();
                 sb.append("Начато отслеживание задачи <b><i>").append(callback[2]).append("</i></b>");
-                BOT.execute(EditMessageText
-                        .builder()
-                        .chatId(cbQ.getMessage().getChatId().toString())
-                        .messageId(cbQ.getMessage().getMessageId())
-                        .text(sb.toString()).parseMode("HTML")
-                        .build());
+                messageText = sb.toString();
                 sb.setLength(0);
                 sb.append("stop:").append(id).append(":").append(callback[2]);
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .replyMarkup(
-                                        InlineKeyboardMarkup
-                                                .builder()
-                                                .keyboard(Keyboards.getStopTasksKeyboard("Остановить отслеживание", sb.toString()))
-                                                .build()
-                                )
-                                .build()
-                );
+                keyboard = Keyboards.getStopTasksKeyboard("Остановить отслеживание", sb.toString());
                 break;
             }
             case "delete":{
                 TasksService tasksService = new TasksService();
                 tasksService.deleteTask(Integer.parseInt(callback[1]));
-                BOT.execute(EditMessageText
-                        .builder()
-                        .chatId(cbQ.getMessage().getChatId().toString())
-                        .messageId(cbQ.getMessage().getMessageId())
-                        .text("Здача удалена! Вы можете продолжить удаление задач, или вернуться назад")
-                        .build());
-                List tasks = new ArrayList();
-                tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .replyMarkup(
-                                        InlineKeyboardMarkup
-                                                .builder()
-                                                .keyboard(Keyboards.getAllTasksKeyboard("delete", tasks))
-                                                .build())
-                                .build());
+                messageText = "Здача удалена! Вы можете продолжить удаление задач, или вернуться назад";
+
+                List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
+                keyboard = Keyboards.getAllTasksKeyboard("delete", tasks);
                 break;
             }
             case "stop":{
@@ -345,27 +136,29 @@ public class CallbackQueryHandler {
                 timeTableService.stopTask(Integer.parseInt(callback[1]), Timestamp.from(Instant.now()));
                 StringBuilder sb = new StringBuilder();
                 sb.append("Отслеживание задачи <b><i>").append(callback[2]).append("</i></b> завершено");
-                BOT.execute(EditMessageText
-                        .builder()
-                        .chatId(cbQ.getMessage().getChatId().toString())
-                        .messageId(cbQ.getMessage().getMessageId())
-                        .text(sb.toString()).parseMode("HTML")
-                        .build());
-                BOT.execute(
-                        EditMessageReplyMarkup
-                                .builder()
-                                .replyMarkup(
-                                        InlineKeyboardMarkup
-                                                .builder()
-                                                .keyboard(Keyboards.getBackToManageTasksKeyboard("Мои задачи"))
-                                                .build())
-                                .chatId(cbQ.getMessage().getChatId().toString())
-                                .messageId(cbQ.getMessage().getMessageId())
-                                .build()
-                );
+                messageText = sb.toString();
+                keyboard = Keyboards.getBackToManageTasksKeyboard("Мои задачи");
                 break;
             }
         }
+        BOT.execute(EditMessageText
+                .builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .text(messageText).parseMode("HTML")
+                .build());
+        BOT.execute(
+                EditMessageReplyMarkup
+                        .builder()
+                        .replyMarkup(
+                                InlineKeyboardMarkup
+                                        .builder()
+                                        .keyboard(keyboard)
+                                        .build())
+                        .chatId(cbQ.getMessage().getChatId().toString())
+                        .messageId(cbQ.getMessage().getMessageId())
+                        .build()
+        );
         BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
     }
 }

@@ -32,12 +32,10 @@ public class TasksDao {
         session.close();
     }
 
-      public void delete(long id){
+    public void delete(long id){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        Query query =
-                  session.createQuery("DELETE FROM Tasks WHERE id = :id")
-                          .setParameter("id", id);
+        Query query = session.createQuery("DELETE FROM Tasks WHERE id = :id").setParameter("id", id);
         query.executeUpdate();
         transaction.commit();
         session.close();
@@ -45,9 +43,8 @@ public class TasksDao {
 
     public List<Tasks> findByIdUserTelegram(long idUserTelegram){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Query query =
-                session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
-                        .setParameter("idUserTelegram", idUserTelegram);
+        Query query = session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
+                .setParameter("idUserTelegram", idUserTelegram);
 
         List<Tasks> tasks = query.list();
         session.close();
@@ -56,7 +53,7 @@ public class TasksDao {
 
     public List<Tasks> findAll(long idUserTelegram){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<Tasks> tasks = (List<Tasks>) session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
+        List<Tasks> tasks = session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
                 .setParameter("idUserTelegram", idUserTelegram).list();
         session.close();
         return tasks;

@@ -5,7 +5,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
-import ru.dmitryvinogradov.Models.Users;
 
 
 public class HibernateSessionFactoryUtil {

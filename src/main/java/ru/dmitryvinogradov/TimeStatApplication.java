@@ -9,7 +9,6 @@ public class TimeStatApplication {
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(new TimeStatBot());
-            TimeStatBot bot = new TimeStatBot();
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

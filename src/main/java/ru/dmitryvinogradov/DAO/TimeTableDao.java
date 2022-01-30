@@ -37,9 +37,7 @@ public class TimeTableDao {
     public void delete(long id){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        Query query =
-                session.createQuery("DELETE FROM TimeTable WHERE id = :id")
-                        .setParameter("id", id);
+        Query query = session.createQuery("DELETE FROM TimeTable WHERE id = :id").setParameter("id", id);
         query.executeUpdate();
         transaction.commit();
         session.close();
@@ -47,17 +45,13 @@ public class TimeTableDao {
 
     public String taskStat (long idTask, Timestamp timestampNow, Timestamp timestampAgo){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-//        String sumHql = "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'DD:HH24:MI:SS') FROM TimeTable WHERE idTask = :idTask " +
-//                "AND startedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
-//                "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
-//                "GROUP BY idTask ";
-        Query sumQuery = session.createQuery(
+        Query sumQuery = session
+                .createQuery(
                 "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'DD:HH24:MI:SS') " +
                 "FROM TimeTable WHERE idTask = :idTask " +
                 "AND startedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
                 "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
-                "GROUP BY idTask "
-        )
+                "GROUP BY idTask")
                 .setParameter("idTask", idTask)
                 .setParameter("timestampNow", timestampNow)
                 .setParameter("timestampAgo", timestampAgo);
