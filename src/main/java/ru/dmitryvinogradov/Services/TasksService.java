@@ -30,4 +30,7 @@ public class TasksService {
     public List<Tasks> findByIdUserTelegram(long idUserTelegram){
         return tasksDao.findByIdUserTelegram(idUserTelegram);
     }
+
+    public List<Tasks> findAll(long idUserTelegram){ return tasksDao.findAll(idUserTelegram); }
+
 }

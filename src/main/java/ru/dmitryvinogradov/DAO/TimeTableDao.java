@@ -3,10 +3,10 @@ package ru.dmitryvinogradov.DAO;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.utils.HibernateSessionFactoryUtil;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class TimeTableDao {
@@ -43,5 +43,30 @@ public class TimeTableDao {
         query.executeUpdate();
         transaction.commit();
         session.close();
+    }
+
+    public String taskStat (long idTask, Timestamp timestampNow, Timestamp timestampAgo){
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+//        String sumHql = "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'DD:HH24:MI:SS') FROM TimeTable WHERE idTask = :idTask " +
+//                "AND startedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
+//                "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
+//                "GROUP BY idTask ";
+        Query sumQuery = session.createQuery(
+                "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'DD:HH24:MI:SS') " +
+                "FROM TimeTable WHERE idTask = :idTask " +
+                "AND startedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
+                "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
+                "GROUP BY idTask "
+        )
+                .setParameter("idTask", idTask)
+                .setParameter("timestampNow", timestampNow)
+                .setParameter("timestampAgo", timestampAgo);
+        List result = sumQuery.list();
+        session.close();
+        if(!result.isEmpty()){
+            return result.get(0).toString();
+        } else {
+            return null;
+        }
     }
 }

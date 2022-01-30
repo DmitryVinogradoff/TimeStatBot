@@ -4,6 +4,8 @@ import ru.dmitryvinogradov.DAO.TimeTableDao;
 import ru.dmitryvinogradov.Models.TimeTable;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class TimeTableService {
     public TimeTableService() {
@@ -33,6 +35,23 @@ public class TimeTableService {
 
     public void deleteTimeTable(long id){
         timeTableDao.delete(id);
+    }
+
+    public String taskStat(long idTask, String period){
+        Timestamp timestampNow = Timestamp.from(Instant.now());
+        Timestamp timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(1));
+        switch (period){
+            case "day":
+                timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(1));
+                break;
+            case "week":
+                timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(7));
+                break;
+            case "month":
+                timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusMonths(1));
+                break;
+        }
+        return timeTableDao.taskStat(idTask, timestampNow, timestampAgo);
     }
 
 }

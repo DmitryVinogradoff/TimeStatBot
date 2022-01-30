@@ -5,9 +5,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
-import ru.dmitryvinogradov.Models.TimeTable;
+import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Services.TasksService;
 import ru.dmitryvinogradov.Services.TimeTableService;
 
@@ -46,8 +47,49 @@ public class CallbackQueryHandler {
                                 .messageId(cbQ.getMessage().getMessageId())
                                 .build()
                 );
-              //  BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 break;
+            }
+
+            case "period_of_stats": {
+                TasksService tasksService = new TasksService();
+                List<Tasks> tasks = tasksService.findAll(cbQ.getFrom().getId());
+                TimeTableService timeTableService = new TimeTableService();
+                StringBuilder sb = new StringBuilder();
+                if(!tasks.isEmpty()) {
+                    for (Tasks task : tasks) {
+                        String taskStat = timeTableService.taskStat(task.getId(), callback[1]);
+                        if ((taskStat != null)) {
+                            sb.append("На <b><i>").append(task.getName()).append("</i></b> потрачено ");
+                            sb.append(taskStat);
+                            sb.append("\n");
+                        }
+                    }
+                    String messageText = sb.toString();
+                    if (messageText.isBlank()) {
+                        messageText = "У Вас нет статистики за этот период";
+                    }
+                    BOT.execute(
+                            EditMessageText
+                                    .builder()
+                                    .text(messageText)
+                                    .parseMode("HTML")
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build());
+                    BOT.execute(
+                            EditMessageReplyMarkup
+                                    .builder()
+                                    .replyMarkup(
+                                            InlineKeyboardMarkup
+                                                    .builder()
+                                                    .keyboard(Keyboards.getBackToStatsTasksKeyboard())
+                                                    .build())
+                                    .chatId(cbQ.getMessage().getChatId().toString())
+                                    .messageId(cbQ.getMessage().getMessageId())
+                                    .build()
+                    );
+                    break;
+                }
             }
 
             case "tasks": {
@@ -73,18 +115,25 @@ public class CallbackQueryHandler {
                                 .messageId(cbQ.getMessage().getMessageId())
                                 .build()
                 );
-
-              //  BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());//убираем "часики"
                 break;
             }
             case "stats_tasks":{
-                if(false){//запрос в базу, какие задачи, и инлайн клавиатура с ними
-
+                TasksService tasksService = new TasksService();
+                List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
+                String messageText;
+                List<List<InlineKeyboardButton>>  keyboard;
+                if(!tasks.isEmpty()){
+                    messageText = "Выберете период, за который Вы хотет просмотреть статистику";
+                    keyboard = Keyboards.getChoicePeriodStatsKeyboard();
                 } else {
+                    messageText = "У Вас пока нет статистики по задачам";
+                    keyboard = Keyboards.getBackToStartMenuKeyboard();
+                }
+                {
                     BOT.execute(
                             EditMessageText
                                     .builder()
-                                    .text("У Вас пока нет статистики по задачам")
+                                    .text(messageText)
                                     .chatId(cbQ.getMessage().getChatId().toString())
                                     .messageId(cbQ.getMessage().getMessageId())
                                     .build());
@@ -94,13 +143,12 @@ public class CallbackQueryHandler {
                                     .replyMarkup(
                                             InlineKeyboardMarkup
                                                     .builder()
-                                                    .keyboard(Keyboards.getBackToStartMenuKeyboard())
+                                                    .keyboard(keyboard)
                                                     .build())
                                     .chatId(cbQ.getMessage().getChatId().toString())
                                     .messageId(cbQ.getMessage().getMessageId())
                                     .build()
                     );
-                   // BOT.execute(AnswerCallbackQuery.builder().callbackQueryId(cbQ.getId()).build());
                 }
                 break;
             }
@@ -293,6 +341,7 @@ public class CallbackQueryHandler {
             }
             case "stop":{
                 TimeTableService timeTableService = new TimeTableService();
+                //TODO спрятать дату "под капот" метода
                 timeTableService.stopTask(Integer.parseInt(callback[1]), Timestamp.from(Instant.now()));
                 StringBuilder sb = new StringBuilder();
                 sb.append("Отслеживание задачи <b><i>").append(callback[2]).append("</i></b> завершено");

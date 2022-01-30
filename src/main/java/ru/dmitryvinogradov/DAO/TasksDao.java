@@ -53,4 +53,12 @@ public class TasksDao {
         session.close();
         return tasks;
     }
+
+    public List<Tasks> findAll(long idUserTelegram){
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        List<Tasks> tasks = (List<Tasks>) session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
+                .setParameter("idUserTelegram", idUserTelegram).list();
+        session.close();
+        return tasks;
+    }
 }

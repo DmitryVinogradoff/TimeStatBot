@@ -31,6 +31,12 @@ public class Keyboards {
         String[] callbackOnButton = new String[] {"tasks"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
+
+    public static List<List<InlineKeyboardButton>> getBackToStatsTasksKeyboard(){
+        String[] captionOnButton = new String[] {"Назад"};
+        String[] callbackOnButton = new String[] {"stats_tasks"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
     //метод для клавиатуры возврата из добавления задач
     public static List<List<InlineKeyboardButton>> getBackToManageTasksKeyboard(String text){
         String[] captionOnButton = new String[] {text};
@@ -61,6 +67,12 @@ public class Keyboards {
         captionOnButton[i] = "Назад";
         callbackOnButton[i] = "tasks";
         return keyboardGenerator(2, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getChoicePeriodStatsKeyboard(){
+        String[] captionOnButton = new String[] {"День", "Неделя", "Месяц", "Назад"};
+        String[] callbackOnButton = new String[] {"period_of_stats:day", "period_of_stats:week", "period_of_stats:month", "start_menu"};
+        return keyboardGenerator(3, captionOnButton, callbackOnButton);
     }
 
     private static List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine, String[] captionOnButton, String[] callbackOnButton){
