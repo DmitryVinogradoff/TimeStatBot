@@ -37,12 +37,13 @@ public class MessageHandler {
     private void commandManager (String command) throws TelegramApiException {
         switch (command){
             case "/start":
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Добрый день, ").append(message.getFrom().getFirstName()).append("!\n");
-                stringBuilder.append("Данный бот предназначен для учета и анализа времени, потраченного на какие-либо задачи.");
+                StringBuilder sb = new StringBuilder();
+                sb.append("Привет, ").append(message.getFrom().getFirstName()).append("!\n");
+                sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач.\n\n");
+                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня.");
                 BOT.execute(SendMessage
                             .builder()
-                            .text(stringBuilder.toString())
+                            .text(sb.toString())
                             .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getStartMenuKeyboard()).build())
                             .chatId(message.getChatId().toString())
                             .build()
