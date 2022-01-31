@@ -47,7 +47,7 @@ public class TimeTableDao {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Query sumQuery = session
                 .createQuery(
-                "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'DD:HH24:MI:SS') " +
+                "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'HH24:MI') " +
                 "FROM TimeTable WHERE idTask = :idTask " +
                 "AND startedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
                 "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
