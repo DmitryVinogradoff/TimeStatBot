@@ -1,21 +1,30 @@
 package ru.dmitryvinogradov.CallbackQueryHandlers;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.dmitryvinogradov.Histograms.Histogram;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
 import ru.dmitryvinogradov.Models.Tasks;
+import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.Services.TasksService;
 import ru.dmitryvinogradov.Services.TimeTableService;
 
+import java.io.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.dmitryvinogradov.GlobalConfig.BOT;
 
@@ -89,19 +98,75 @@ public class CallbackQueryHandler {
             case "period_of_stats": {
                 TasksService tasksService = new TasksService();
                 List<Tasks> tasks = tasksService.findAll(cbQ.getFrom().getId());
+                Map<String, String> nameOfPeriods= new HashMap<>();
+                nameOfPeriods.put("day", "Статистика за день");
+                nameOfPeriods.put("week", "Статистика за неделю");
+                nameOfPeriods.put("month", "Статистика за месяц");
                 if(!tasks.isEmpty()) {
                     TimeTableService timeTableService = new TimeTableService();
                     StringBuilder sb = new StringBuilder();
+                    sb.append("<b>").append(nameOfPeriods.get(callback[1])).append("</b>\n\n");
+                    Histogram histogram = new Histogram();
                     for (Tasks task : tasks) {
                         String taskStat = timeTableService.taskStat(task.getId(), callback[1]);
                         if ((taskStat != null)) {
-                            sb.append("На <b><i>").append(task.getName()).append("</i></b> потрачено ");
-                            sb.append(taskStat);
-                            sb.append("\n");
+                            String[] time = taskStat.split(":");
+                            histogram.setNameTask(task.getName());
+                            histogram.setTimeTask(Double.parseDouble(time[1]));
+                            sb.append("На <b><i>").append(task.getName()).append("</i></b> потрачено: ");
+
+                            if(!(Integer.parseInt(time[0]) == 0)) sb.append(time[0]).append(" часов ");
+
+                            sb.append(time[1]).append(" минут\n");
                         }
                     }
+                    //TODO Проверить чтобы не пустые данные
+                    try {
+                        histogram.generateHistogram();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        InputStream fileInputStream = new FileInputStream("histogram.png");
+                        InputFile inputFile = new InputFile(fileInputStream, "histogram.png");
+                        BOT.execute(SendPhoto
+                                .builder()
+                                .chatId(chatId)
+                                .photo(inputFile)
+                                .build());
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     messageText = sb.toString();
                     keyboard = Keyboards.getBackToStatsTasksKeyboard();
+
+                    BOT.execute(
+                            DeleteMessage
+                                    .builder()
+                                    .messageId(messageId)
+                                    .chatId(chatId)
+                                    .build()
+                    );
+
+
+                    BOT.execute(
+                            SendMessage
+                                    .builder()
+                                    .text(messageText).parseMode("HTML")
+                                    .chatId(chatId)
+                                    //TODO Добавить кнопку начать отслеживание добавленной задачи сейчас
+                                    .replyMarkup(
+                                            InlineKeyboardMarkup
+                                                    .builder()
+                                                    .keyboard(keyboard)
+                                                    .build()
+                                    )
+                                    .build()
+                    );
+
+
                     if (messageText.isBlank()) {
                         messageText = "У Вас нет статистики за этот период";
                     }
@@ -141,6 +206,7 @@ public class CallbackQueryHandler {
                 break;
             }
         }
+
         BOT.execute(EditMessageText
                 .builder()
                 .chatId(chatId)
