@@ -22,7 +22,8 @@ public class TimeTableService {
         return timeTableDao.save(timeTable);
     }
 
-    public long stopTask(long id, Timestamp stoppedAt){
+    public long stopTask(long id){
+        Timestamp stoppedAt = Timestamp.from(Instant.now());
         TimeTable timeTable = timeTableDao.findById(id);
         timeTable.setStoppedAt(stoppedAt);
         timeTable.setStatus(false);
