@@ -52,22 +52,22 @@ public class MessageHandler {
         }
     }
 
-    private void messageManager (String text) throws TelegramApiException {
+    private void messageManager (String taskName) throws TelegramApiException {
         //TODO сделать проверку
-        Tasks task = new Tasks(text, Math.toIntExact(message.getFrom().getId()));
+        Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()));
         TasksService tasksService = new TasksService();
-        tasksService.saveTask(task);
-
+        long idTask = tasksService.saveTask(task);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Задача \"").append(taskName).append("\" успешно добавлена!\nМожно начать её отслеживание прямо сейчас. Для этого нажми кнопку \"Начать отслеживание\"");
         BOT.execute(
                 SendMessage
                 .builder()
-                .text("Задача " + text + " успешно добавлена")
+                .text(sb.toString()).parseMode("HTML")
                 .chatId(message.getChatId().toString())
-                        //TODO Добавить кнопку начать отслеживание добавленной задачи сейчас
                 .replyMarkup(
                         InlineKeyboardMarkup
                                 .builder()
-                                .keyboard(Keyboards.getBackToManageTasksKeyboard("Управление задачами"))
+                                .keyboard(Keyboards.getBackToManageTasksKeyboard(idTask, taskName))
                                 .build()
                 )
                 .build()
