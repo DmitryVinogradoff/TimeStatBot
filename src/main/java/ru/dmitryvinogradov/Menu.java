@@ -16,13 +16,17 @@ import static ru.dmitryvinogradov.GlobalConfig.BOT;
 
 public class Menu {
 
-    public static void editMenu(String chatId, Integer messageId, String messageText, List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException {
+    private static void editMessageText(String chatId, Integer messageId, String messageText) throws TelegramApiException {
         BOT.execute(EditMessageText
                 .builder()
                 .chatId(chatId)
                 .messageId(messageId)
                 .text(messageText).parseMode("HTML")
                 .build());
+    }
+
+    public static void editMenu(String chatId, Integer messageId, String messageText, List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException {
+        editMessageText(chatId, messageId, messageText);
         BOT.execute(
                 EditMessageReplyMarkup
                         .builder()
@@ -37,57 +41,48 @@ public class Menu {
         );
     }
 
-    public static void editMenuWithStatsSave(String chatId, Integer messageId, String messageText, List<List<InlineKeyboardButton>> keyboard, String oldMessageText) throws TelegramApiException {
-        BOT.execute(
-                EditMessageText
-                .builder()
-                .chatId(chatId)
-                .messageId(messageId)
-                .text(oldMessageText).parseMode("HTML")
-                .build());
+    public static void sendMenu(String chatId, String messageText,
+                                List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException{
         BOT.execute(
                 SendMessage
                         .builder()
                         .text(messageText).parseMode("HTML")
+                        .chatId(chatId)
                         .replyMarkup(
                                 InlineKeyboardMarkup
                                         .builder()
                                         .keyboard(keyboard)
-                                        .build())
-                        .chatId(chatId)
+                                        .build()
+                        )
                         .build()
         );
+    }
+
+    public static void deleteMesaage(String chatId, Integer messageId) throws TelegramApiException {
+        BOT.execute(DeleteMessage
+                .builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .build()
+        );
+    }
+    public static void editMenuWithStatsSave(String chatId, Integer messageId, String messageText, List<List<InlineKeyboardButton>> keyboard, String oldMessageText) throws TelegramApiException {
+        editMessageText(chatId, messageId, oldMessageText);
+        sendMenu(chatId, messageText, keyboard);
     }
 
     public static void editMenuWithStats(String chatId, Integer messageId, String messageText,
                                   List<List<InlineKeyboardButton>> keyboard, InputFile inputFile)
                                                         throws TelegramApiException {
-        BOT.execute(DeleteMessage
-                        .builder()
-                        .messageId(messageId)
-                        .chatId(chatId)
-                        .build()
-        );
-
+        deleteMesaage(chatId, messageId);
         BOT.execute(SendPhoto
                 .builder()
                 .chatId(chatId)
                 .photo(inputFile)
                 .build()
         );
-
-        BOT.execute(
-                SendMessage
-                        .builder()
-                        .text(messageText).parseMode("HTML")
-                        .replyMarkup(
-                                InlineKeyboardMarkup
-                                        .builder()
-                                        .keyboard(keyboard)
-                                        .build())
-                        .chatId(chatId)
-                        .build()
-        );
-
+        sendMenu(chatId, messageText, keyboard);
     }
+
+
 }

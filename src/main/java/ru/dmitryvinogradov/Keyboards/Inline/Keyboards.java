@@ -37,10 +37,24 @@ public class Keyboards {
         String[] callbackOnButton = new String[] {"stats_tasks"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
+
+    public static List<List<InlineKeyboardButton>> getBackToStatsTasksKeyboardWithSave(){
+        String[] captionOnButton = new String[] {"Назад"};
+        String[] callbackOnButton = new String[] {"stats_tasks:save"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
     //метод для клавиатуры возврата из добавления задач
     public static List<List<InlineKeyboardButton>> getBackToManageTasksKeyboard(String text){
         String[] captionOnButton = new String[] {text};
         String[] callbackOnButton = new String[] {"tasks"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getBackToManageTasksKeyboard(long idTask, String taskName){
+        StringBuilder sb = new StringBuilder();
+        sb.append("tracking:").append(idTask).append(":").append(taskName);
+        String[] captionOnButton = new String[] {"Начать отслеживание", "Управление задачами"};
+        String[] callbackOnButton = new String[] {sb.toString(),"tasks"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 
