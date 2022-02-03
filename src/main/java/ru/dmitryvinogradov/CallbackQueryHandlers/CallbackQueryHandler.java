@@ -27,6 +27,7 @@ public class CallbackQueryHandler {
         Integer messageId = cbQ.getMessage().getMessageId();
         String messageText = "";
         List<List<InlineKeyboardButton>>  keyboard;
+        NOWSTATE.setDefaultState();
         switch (callback[0]){
             case "start_menu": {
                 StringBuilder sb = new StringBuilder();
