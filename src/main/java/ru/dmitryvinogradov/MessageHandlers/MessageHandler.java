@@ -1,17 +1,17 @@
 package ru.dmitryvinogradov.MessageHandlers;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
+import ru.dmitryvinogradov.Menu;
 import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Services.TasksService;
+import ru.dmitryvinogradov.StateMachine.States;
 
 import java.util.Optional;
 
-import static ru.dmitryvinogradov.GlobalConfig.BOT;
+import static ru.dmitryvinogradov.GlobalConfig.NOWSTATE;
 
 public class MessageHandler {
     private Message message;
@@ -35,42 +35,34 @@ public class MessageHandler {
     }
 
     private void commandManager (String command) throws TelegramApiException {
+        String chatId = message.getChatId().toString();
+        Integer messageId = message.getMessageId();
         switch (command){
             case "/start":
                 StringBuilder sb = new StringBuilder();
                 sb.append("Привет, ").append(message.getFrom().getFirstName()).append("!\n");
                 sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач.\n\n");
                 sb.append("Я помогу тебе понять, распределение твоего времени в течении дня.");
-                BOT.execute(SendMessage
-                            .builder()
-                            .text(sb.toString())
-                            .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getStartMenuKeyboard()).build())
-                            .chatId(message.getChatId().toString())
-                            .build()
-                    );
+                Menu.sendMenu(chatId, sb.toString(), Keyboards.getStartMenuKeyboard());
                 break;
+            default:
+                Menu.deleteMesaage(chatId, messageId);
         }
     }
 
     private void messageManager (String taskName) throws TelegramApiException {
-        //TODO сделать проверку
-        Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()));
-        TasksService tasksService = new TasksService();
-        long idTask = tasksService.saveTask(task);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Задача \"").append(taskName).append("\" успешно добавлена!\nМожно начать её отслеживание прямо сейчас. Для этого нажми кнопку \"Начать отслеживание\"");
-        BOT.execute(
-                SendMessage
-                .builder()
-                .text(sb.toString()).parseMode("HTML")
-                .chatId(message.getChatId().toString())
-                .replyMarkup(
-                        InlineKeyboardMarkup
-                                .builder()
-                                .keyboard(Keyboards.getBackToManageTasksKeyboard(idTask, taskName))
-                                .build()
-                )
-                .build()
-        );
+        String chatId = message.getChatId().toString();
+        Integer messageId = message.getMessageId();
+        if(NOWSTATE.getNowState().equals(States.ADDINGTASK)) {
+            Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()));
+            TasksService tasksService = new TasksService();
+            long idTask = tasksService.saveTask(task);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Задача \"").append(taskName).append("\" успешно добавлена!\nМожно начать её отслеживание прямо сейчас. Для этого нажми кнопку \"Начать отслеживание\"");
+            Menu.sendMenu(chatId, sb.toString(), Keyboards.getBackToManageTasksKeyboard(idTask, taskName));
+            NOWSTATE.setDefaultState();
+        } else {
+            Menu.deleteMesaage(chatId, messageId);
+        }
     }
 }

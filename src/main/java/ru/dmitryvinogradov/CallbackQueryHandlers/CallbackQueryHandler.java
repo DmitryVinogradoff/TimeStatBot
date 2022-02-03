@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static ru.dmitryvinogradov.GlobalConfig.BOT;
+import static ru.dmitryvinogradov.GlobalConfig.NOWSTATE;
 
 public class CallbackQueryHandler {
     public void callbackMessage(CallbackQuery cbQ) throws TelegramApiException {
@@ -54,7 +55,7 @@ public class CallbackQueryHandler {
                     messageText = "У тебя пока нет статистики по задачам";
                     keyboard = Keyboards.getBackToStartMenuKeyboard();
                 }
-                if((callback.length > 1) && (callback[1].equals("test"))){
+                if((callback.length > 1) && (callback[1].equals("save"))){
                     String oldMessageText = cbQ.getMessage().getText();
                     Menu.editMenuWithStatsSave(chatId, messageId, messageText, keyboard, oldMessageText);
                 } else {
@@ -82,6 +83,7 @@ public class CallbackQueryHandler {
                 break;
             }
             case "add_task_menu": {
+                NOWSTATE.setAddingTaskState();
                 messageText = "Добавь задачу, прислав боту сообщение с ее названием";
                 keyboard = Keyboards.getBackToManageTasksKeyboard();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
@@ -130,9 +132,9 @@ public class CallbackQueryHandler {
                         }
                     }
                     messageText = sb.toString();
-                    keyboard = Keyboards.getBackToStatsTasksKeyboardTest();
                     if (messageText.isBlank()) {
                         messageText = "У тебя нет статистики за этот период";
+                        keyboard = Keyboards.getBackToStatsTasksKeyboard();
                         Menu.editMenu(chatId, messageId, messageText, keyboard);
                     } else {
                         InputStream fileInputStream = null;
@@ -141,8 +143,8 @@ public class CallbackQueryHandler {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
                         InputFile inputFile = new InputFile(fileInputStream, "histogram");
+                        keyboard = Keyboards.getBackToStatsTasksKeyboardWithSave();
                         Menu.editMenuWithStats(chatId, messageId, messageText, keyboard, inputFile);
                     }
                     break;
