@@ -15,8 +15,8 @@ public class TasksService {
         return tasksDao.findById(id);
     }
 
-    public void saveTask(Tasks tasks){
-        tasksDao.save(tasks);
+    public long saveTask(Tasks tasks){
+        return tasksDao.save(tasks);
     }
 
     public void updateTask(Tasks tasks){

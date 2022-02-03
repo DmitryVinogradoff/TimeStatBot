@@ -16,7 +16,7 @@ public class TimeTableDao {
         session.close();
         return timeTable;
     }
-    //TODO попробовать убрать дублирование кода и эти функции вынести в общий файл
+
     public long save(TimeTable timeTable){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();

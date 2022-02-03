@@ -16,12 +16,14 @@ public class TasksDao {
         return tasks;
     }
 
-    public void save(Tasks tasks){
+    public long save(Tasks tasks){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         session.save(tasks);
+        long id = tasks.getId();
         transaction.commit();
         session.close();
+        return id;
     }
 
     public void update(Tasks tasks){
