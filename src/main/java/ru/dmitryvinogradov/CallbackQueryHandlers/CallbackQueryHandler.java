@@ -29,11 +29,38 @@ public class CallbackQueryHandler {
         List<List<InlineKeyboardButton>>  keyboard;
         NOWSTATE.setDefaultState();
         switch (callback[0]){
+            case "test_data":{
+                keyboard = Keyboards.getTestDatasetMenuKeyboard();
+                messageText = "Нажмите кнопку <i>\"Добавить тестовые данные\"</i>, чтобы заболнить базу данными и просмотреть весь функционал бота.\n\n" +
+                        "Чтобы удалить тестовые данные из базы, и начать работу только со своими данными нажмите кнопку <i>\"Удалить тестовые данные\"</i>";
+                Menu.editMenu(chatId, messageId, messageText, keyboard);
+                break;
+            }
+
+            case "add_test_data":{
+                TasksService tasksService = new TasksService();
+                tasksService.addTestData(cbQ.getFrom().getId());
+                messageText = "Тестовые данные успешно добавлены!\nТеперь можно вернуться в главное меню и посмотреть все функции бота";
+                keyboard = Keyboards.getBackToStartMenuKeyboard();
+                Menu.editMenu(chatId, messageId, messageText, keyboard);
+                break;
+            }
+
+            case "delete_test_data":{
+                TasksService tasksService = new TasksService();
+                tasksService.deleteTestData(cbQ.getFrom().getId());
+                messageText = "Тестовые данные успешно удалены!";
+                keyboard = Keyboards.getBackToStartMenuKeyboard();
+                Menu.editMenu(chatId, messageId, messageText, keyboard);
+                break;
+            }
+
             case "start_menu": {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Привет, <b><i>").append(cbQ.getFrom().getFirstName()).append("!</i></b>\n");
                 sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач\n\n");
-                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня");
+                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня\n\n");
+                sb.append("<i>Чтобы оценить возможности бота сразу, без отслеживания личной статистики, можно заполнить базу <b>тестовыми данными</b> нажав на соответствующую кнопку</i>");
 
                 keyboard = Keyboards.getStartMenuKeyboard();
                 Menu.editMenu(chatId, messageId, sb.toString(), keyboard);
@@ -66,7 +93,9 @@ public class CallbackQueryHandler {
                 break;
             }
             case "about":{
-                //menu.editMenu(chatId, messageId, messageText, keyboard);
+                messageText = "© 2022 Dmitry Vinogradov";
+                keyboard = Keyboards.getBackToStartMenuKeyboard();
+                Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
             }
 
@@ -123,7 +152,7 @@ public class CallbackQueryHandler {
                             Integer minutes = Integer.parseInt(time[1]);
                             Integer totalTime = hours * 60 + minutes;
                             if(totalTime != 0){
-                                histogram.setNameTask(task.getName());
+                                histogram.setNameTask(Long.toString(task.getId()));
                                 histogram.setTimeTask(totalTime);
                                 sb.append("На \"").append(task.getName()).append("\" потрачено: ");
                                 if(hours != 0) sb.append(hours).append(" часов ");

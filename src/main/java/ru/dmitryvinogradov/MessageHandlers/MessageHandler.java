@@ -42,7 +42,8 @@ public class MessageHandler {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Привет, ").append(message.getFrom().getFirstName()).append("!\n");
                 sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач.\n\n");
-                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня.");
+                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня.\n\n");
+                sb.append("<i>Чтобы оценить возможности бота сразу, без отслеживания личной статистики, можно заполнить базу <b>тестовыми данными</b> нажав на соответствующую кнопку</i>");
                 Menu.sendMenu(chatId, sb.toString(), Keyboards.getStartMenuKeyboard());
                 break;
             default:

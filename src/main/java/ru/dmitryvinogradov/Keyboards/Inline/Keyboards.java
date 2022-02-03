@@ -8,8 +8,14 @@ import java.util.List;
 
 public class Keyboards {
     public static List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
-        String[] captionOnButton = new String[] {"Управление задачами", "Статистика", "О боте"};
-        String[] callbackOnButton = new String[] {"tasks", "stats_tasks", "about"};
+        String[] captionOnButton = new String[] {"Управление задачами", "Статистика", "О боте", "Тестовые данные"};
+        String[] callbackOnButton = new String[] {"tasks", "stats_tasks", "about", "test_data"};
+        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    }
+
+    public static List<List<InlineKeyboardButton>> getTestDatasetMenuKeyboard(){
+        String[] captionOnButton = new String[] {"Добавить тестовые данные", "Удалить тестовые данные", "Назад"};
+        String[] callbackOnButton = new String[] {"add_test_data", "delete_test_data", "start_menu"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
 

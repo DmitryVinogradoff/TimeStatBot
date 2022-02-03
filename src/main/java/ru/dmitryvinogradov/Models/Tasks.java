@@ -15,6 +15,9 @@ public class Tasks {
     @Column (name = "id_user_telegram")
     private long idUserTelegram;
 
+    @Column (name = "test_data")
+    private boolean testData;
+
     public long getId() {
         return id;
     }
@@ -31,7 +34,7 @@ public class Tasks {
         return idUserTelegram;
     }
 
-    public void setIdUserTelegram(int idUserTelegram) {
+    public void setIdUserTelegram(long idUserTelegram) {
         this.idUserTelegram = idUserTelegram;
     }
 
@@ -42,5 +45,13 @@ public class Tasks {
         this.id = id;
         this.name = name;
         this.idUserTelegram = idUserTelegram;
+    }
+
+    public boolean isTestData() {
+        return testData;
+    }
+
+    public void setTestData(boolean testData) {
+        this.testData = testData;
     }
 }

@@ -60,4 +60,15 @@ public class TasksDao {
         session.close();
         return tasks;
     }
+
+    public void deleteTestData(long idUserTelegram){
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("DELETE FROM Tasks WHERE idUserTelegram = :idUserTelegram AND testData = :testData")
+                .setParameter("testData", true)
+                .setParameter("idUserTelegram", idUserTelegram);
+        query.executeUpdate();
+        transaction.commit();
+        session.close();
+    }
 }
