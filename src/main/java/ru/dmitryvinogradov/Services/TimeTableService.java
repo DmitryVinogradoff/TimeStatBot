@@ -59,11 +59,9 @@ public class TimeTableService {
         return timeTableDao.findTestDataByIdTask(idTaskTestData);
     }
 
-    public void setTestData(List<TimeTable> testData, long idTask){
-        for(TimeTable timeTable : testData){
-            timeTable.setIdTask(idTask);
+    public void setTestData(TimeTable timeTable){
             timeTableDao.save(timeTable);
-        }
     }
-
 }
+
+
