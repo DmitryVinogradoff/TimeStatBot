@@ -41,10 +41,11 @@ public class Tasks {
     public Tasks() {
     }
 
-    public Tasks(String name, int idUserTelegram) {
+    public Tasks(String name, long idUserTelegram, boolean testData) {
         this.id = id;
         this.name = name;
         this.idUserTelegram = idUserTelegram;
+        this.testData = testData;
     }
 
     public boolean isTestData() {
