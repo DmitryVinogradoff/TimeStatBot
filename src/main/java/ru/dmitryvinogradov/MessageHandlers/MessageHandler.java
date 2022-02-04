@@ -41,8 +41,9 @@ public class MessageHandler {
             case "/start":
                 StringBuilder sb = new StringBuilder();
                 sb.append("Привет, ").append(message.getFrom().getFirstName()).append("!\n");
-                sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач.\n\n");
-                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня.\n\n");
+                sb.append("Я TimeStatBot, предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач\n\n");
+                sb.append("Я помогу понять, на что было потрачено время в течении дня, недели или месяца\n\n");
+                sb.append("Бот выводит статистику, только по тем задачам, которые суммарно выполнялись больше 1 минуты, округляя при этом время в меньшую сторону\n\n");
                 sb.append("<i>Чтобы оценить возможности бота сразу, без отслеживания личной статистики, можно заполнить базу <b>тестовыми данными</b> нажав на соответствующую кнопку</i>");
                 Menu.sendMenu(chatId, sb.toString(), Keyboards.getStartMenuKeyboard());
                 break;
@@ -55,11 +56,11 @@ public class MessageHandler {
         String chatId = message.getChatId().toString();
         Integer messageId = message.getMessageId();
         if(NOWSTATE.getNowState().equals(States.ADDINGTASK)) {
-            Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()));
+            Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()), false);
             TasksService tasksService = new TasksService();
             long idTask = tasksService.saveTask(task);
             StringBuilder sb = new StringBuilder();
-            sb.append("Задача \"").append(taskName).append("\" успешно добавлена!\nМожно начать её отслеживание прямо сейчас. Для этого нажми кнопку \"Начать отслеживание\"");
+            sb.append("Задача \"").append(taskName).append("\" успешно добавлена!\n\nМожно начать её отслеживание прямо сейчас\n\n<i>Для этого нажмите кнопку \"Начать отслеживание\"</i>");
             Menu.sendMenu(chatId, sb.toString(), Keyboards.getBackToManageTasksKeyboard(idTask, taskName));
             NOWSTATE.setDefaultState();
         } else {
