@@ -56,7 +56,7 @@ public class MessageHandler {
         String chatId = message.getChatId().toString();
         Integer messageId = message.getMessageId();
         if(NOWSTATE.getNowState().equals(States.ADDINGTASK)) {
-            Tasks task = new Tasks(taskName, Math.toIntExact(message.getFrom().getId()), false);
+            Tasks task = new Tasks(taskName, message.getFrom().getId(), false);
             TasksService tasksService = new TasksService();
             long idTask = tasksService.saveTask(task);
             StringBuilder sb = new StringBuilder();
