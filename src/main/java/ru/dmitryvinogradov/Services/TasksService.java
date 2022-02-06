@@ -31,7 +31,7 @@ public class TasksService {
         return tasksDao.findByIdUserTelegram(idUserTelegram);
     }
 
-    public List<Tasks> findAll(long idUserTelegram){ return tasksDao.findAll(idUserTelegram); }
+    public List<Tasks> findTestData(long idUserTelegram){ return tasksDao.findTestData(idUserTelegram); }
 
     public void deleteTestData(long idUserTelegram){
         tasksDao.deleteTestData(idUserTelegram);

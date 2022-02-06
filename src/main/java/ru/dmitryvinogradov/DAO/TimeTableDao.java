@@ -3,7 +3,6 @@ package ru.dmitryvinogradov.DAO;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.utils.HibernateSessionFactoryUtil;
 
@@ -65,13 +64,13 @@ public class TimeTableDao {
         }
     }
 
-    public List<TimeTable> findTestDataByIdTask(long idTaskTestData){
+    public void deleteByIdTask(long idTask){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Query query = session.createQuery("FROM TimeTable WHERE idTask = :idTaskTestData")
-                .setParameter("idTaskTestData", idTaskTestData);
-
-        List<TimeTable> testData = query.list();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("DELETE FROM TimeTable WHERE idTask = :idTask")
+                .setParameter("idTask", idTask);
+        query.executeUpdate();
+        transaction.commit();
         session.close();
-        return testData;
     }
 }

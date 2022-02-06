@@ -53,10 +53,11 @@ public class TasksDao {
         return tasks;
     }
 
-    public List<Tasks> findAll(long idUserTelegram){
+    public List<Tasks> findTestData(long idUserTelegram){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<Tasks> tasks = session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram")
-                .setParameter("idUserTelegram", idUserTelegram).list();
+        List<Tasks> tasks = session.createQuery("FROM Tasks WHERE idUserTelegram = :idUserTelegram AND testData = :testData")
+                .setParameter("idUserTelegram", idUserTelegram)
+                .setParameter("testData", true).list();
         session.close();
         return tasks;
     }

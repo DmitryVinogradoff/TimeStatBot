@@ -6,7 +6,6 @@ import ru.dmitryvinogradov.Models.TimeTable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class TimeTableService {
     public TimeTableService() {
@@ -55,13 +54,11 @@ public class TimeTableService {
         return timeTableDao.taskStat(idTask, timestampNow, timestampAgo);
     }
 
-    public List<TimeTable> getTestData(long idTaskTestData){
-        return timeTableDao.findTestDataByIdTask(idTaskTestData);
-    }
-
     public void setTestData(TimeTable timeTable){
             timeTableDao.save(timeTable);
     }
+
+    public void deleteByIdTask(long idTask){ timeTableDao.deleteByIdTask(idTask); }
 }
 
 
