@@ -5,6 +5,8 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.dmitryvinogradov.DataSet.DataSetDeleter;
+import ru.dmitryvinogradov.DataSet.DataSetGenerator;
 import ru.dmitryvinogradov.Histograms.Histogram;
 import ru.dmitryvinogradov.Keyboards.Inline.Keyboards;
 import ru.dmitryvinogradov.Menu;
@@ -14,7 +16,8 @@ import ru.dmitryvinogradov.Services.TimeTableService;
 
 import java.io.*;
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static ru.dmitryvinogradov.GlobalConfig.BOT;
@@ -31,26 +34,38 @@ public class CallbackQueryHandler {
         switch (callback[0]){
             case "test_data":{
                 keyboard = Keyboards.getTestDatasetMenuKeyboard();
-                messageText = "Нажмите кнопку <i>\"Добавить тестовые данные\"</i>, чтобы заболнить базу данными и просмотреть весь функционал бота.\n\n" +
-                        "Чтобы удалить тестовые данные из базы, и начать работу только со своими данными нажмите кнопку <i>\"Удалить тестовые данные\"</i>";
+                Locale locale = new Locale("ru", "RU");
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM", locale);
+                LocalDate localDate = LocalDate.now();
+                LocalDate minusMonthLocalDate = localDate.minusMonths(1);
+                StringBuilder sb = new StringBuilder();
+                sb.append("Нажмите кнопку <i>\"Добавить тестовые данные\"</i>, чтобы заполнить базу случайно сгенерированными данными за период c <i><b>")
+                        .append(minusMonthLocalDate.getDayOfMonth()).append(" ").append(minusMonthLocalDate.format(dateTimeFormatter)).append(" ").append(minusMonthLocalDate.getYear())
+                        .append("</b></i> по <i><b>")
+                        .append(localDate.getDayOfMonth()).append(" ").append(localDate.format(dateTimeFormatter)).append(" ").append(localDate.getYear())
+                        .append("</b></i> и оценить весь функционал бота (заполнение займет около 5 секунд)\n\nЧтобы удалить тестовые данные из базы, и начать работу только со своими данными, нажмите кнопку <i>\"Удалить тестовые данные\"</i>");
+                messageText = sb.toString();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
             }
 
             case "add_test_data":{
-                TasksService tasksService = new TasksService();
-                tasksService.addTestData(cbQ.getFrom().getId());
-                messageText = "Тестовые данные успешно добавлены!\nТеперь можно вернуться в главное меню и посмотреть все функции бота";
-                keyboard = Keyboards.getBackToStartMenuKeyboard();
+                if(DataSetGenerator.generateDataSetOnMonth(cbQ.getFrom().getId())) {
+                    messageText = "Тестовые данные успешно добавлены!\nТеперь можно вернуться в главное меню и оценить все функции бота";
+                } else {
+                    messageText = "Тестовые данные уже добавлены!\nМожно вернуться в главное меню и оценить все функции бота";
+                }
+                keyboard = Keyboards.getStopTasksKeyboard("Главное меню", "start_menu");
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
             }
 
             case "delete_test_data":{
-                TasksService tasksService = new TasksService();
-                tasksService.deleteTestData(cbQ.getFrom().getId());
+//                TasksService tasksService = new TasksService();
+//                tasksService.deleteTestData(cbQ.getFrom().getId());
+                DataSetDeleter.deleteDataSet(cbQ.getFrom().getId());
                 messageText = "Тестовые данные успешно удалены!";
-                keyboard = Keyboards.getBackToStartMenuKeyboard();
+                keyboard = Keyboards.getStopTasksKeyboard("Главное меню", "start_menu");
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
             }
@@ -58,9 +73,10 @@ public class CallbackQueryHandler {
             case "start_menu": {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Привет, <b><i>").append(cbQ.getFrom().getFirstName()).append("!</i></b>\n");
-                sb.append("Я TimeStatBot предназначеный для учета и анализа времени, потраченного на выполнение каких-либо задач\n\n");
-                sb.append("Я помогу тебе понять, распределение твоего времени в течении дня\n\n");
-                sb.append("<i>Чтобы оценить возможности бота сразу, без отслеживания личной статистики, можно заполнить базу <b>тестовыми данными</b> нажав на соответствующую кнопку</i>");
+                sb.append("Я TimeStatBot, предназначеный для учета и анализа времени, затраченного на выполнение каких-либо задач\n\n");
+                sb.append("Я помогу понять, на что было потрачено время в течении дня, недели или месяца\n\n");
+                sb.append("Бот выводит статистику только по тем задачам, которые суммарно выполнялись больше 1 минуты, округляя при этом время в меньшую сторону\n\n");
+                sb.append("<i>Чтобы оценить возможности бота сразу, без отслеживания личной статистики, можно заполнить базу <b>тестовыми данными</b>, нажав на соответствующую кнопку</i>");
 
                 keyboard = Keyboards.getStartMenuKeyboard();
                 Menu.editMenu(chatId, messageId, sb.toString(), keyboard);
@@ -68,7 +84,7 @@ public class CallbackQueryHandler {
             }
 
             case "tasks": {
-                messageText = "<b>Меню управления задачами</b>";
+                messageText = "Управления задачами";
                 keyboard = Keyboards.getManageTasksKeyboard();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
@@ -76,13 +92,9 @@ public class CallbackQueryHandler {
             case "stats_tasks":{
                 TasksService tasksService = new TasksService();
                 List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
-                if(!tasks.isEmpty()){
-                    messageText = "Выбери период, за который ты хочешь просмотреть статистику";
-                    keyboard = Keyboards.getChoicePeriodStatsKeyboard();
-                } else {
-                    messageText = "У тебя пока нет статистики по задачам";
-                    keyboard = Keyboards.getBackToStartMenuKeyboard();
-                }
+                messageText = "Нажмите на кнопку с названием периода, чтобы просмотреть статистику";
+                keyboard = Keyboards.getChoicePeriodStatsKeyboard();
+
                 if((callback.length > 1) && (callback[1].equals("save"))){
                     String oldMessageText = cbQ.getMessage().getText();
                     Menu.editMenuWithStatsSave(chatId, messageId, messageText, keyboard, oldMessageText);
@@ -93,7 +105,7 @@ public class CallbackQueryHandler {
                 break;
             }
             case "about":{
-                messageText = "© 2022 Dmitry Vinogradov";
+                messageText = "Стек технологий, используемых в боте:\nJava\nTelegram Bot Java Library\nHibernate\nJFreeChart\n\nБаза данных: PostgreSQL\n\nGitHub: https://github.com/DmitryVinogradoff/TimeStatBot\n\n\nTimeStatBot © Dmitry Vinogradov, 2022 \nhttps://t.me/dmitry_vinogradov";
                 keyboard = Keyboards.getBackToStartMenuKeyboard();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
@@ -103,10 +115,10 @@ public class CallbackQueryHandler {
                 TasksService tasksService = new TasksService();
                 List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
                 if(!tasks.isEmpty()){
-                    messageText = "<b>Твои задачи для отслеживания</b>\n<i>Нажми на название задачи, чтобы начать её отслеживание</i>";
+                    messageText = "Нажмите на название задачи, чтобы начать её отслеживание";
                     keyboard = Keyboards.getAllTasksKeyboard( "tracking", tasks);
                 } else {
-                    messageText = "У тебя нет задач на отслеживание\nДобавь их в меню управлениями задачами, <i>нажав \"Добавить задачу\"</i>";
+                    messageText = "Нет задач на отслеживание\n\nДобавьте их в меню управления задачами, нажав <i>\"Добавить задачу\"</i>";
                     keyboard = Keyboards.getBackToManageTasksKeyboard();
                 }
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
@@ -114,7 +126,7 @@ public class CallbackQueryHandler {
             }
             case "add_task_menu": {
                 NOWSTATE.setAddingTaskState();
-                messageText = "Добавь задачу, прислав боту сообщение с ее названием";
+                messageText = "Добавьте задачу, прислав боту сообщение с ее названием, например: <i>Работа</i>";
                 keyboard = Keyboards.getBackToManageTasksKeyboard();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
@@ -123,10 +135,10 @@ public class CallbackQueryHandler {
                 TasksService tasksService = new TasksService();
                 List<Tasks> tasks =  tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
                 if(!tasks.isEmpty()){
-                    messageText = "<b>Список твоих задач</b>\n<i>Нажми на название задачи, чтобы её удалить</i>";
+                    messageText = "Нажмите на название задачи, чтобы её удалить";
                     keyboard = Keyboards.getAllTasksKeyboard( "delete", tasks);
                 } else {
-                    messageText = "У тебя нет задач, которые можно удалить";
+                    messageText = "Нет задач, которые можно удалить";
                     keyboard = Keyboards.getBackToManageTasksKeyboard();
                 }
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
@@ -135,7 +147,7 @@ public class CallbackQueryHandler {
 
             case "period_of_stats": {
                 TasksService tasksService = new TasksService();
-                List<Tasks> tasks = tasksService.findAll(cbQ.getFrom().getId());
+                List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
                 Map<String, String> nameOfPeriods= new HashMap<>();
                 nameOfPeriods.put("day", "Статистика за день");
                 nameOfPeriods.put("week", "Статистика за неделю");
@@ -152,9 +164,9 @@ public class CallbackQueryHandler {
                             Integer minutes = Integer.parseInt(time[1]);
                             Integer totalTime = hours * 60 + minutes;
                             if(totalTime != 0){
-                                histogram.setNameTask(Long.toString(task.getId()));
+                                histogram.setNameTask(task.getName());
                                 histogram.setTimeTask(totalTime);
-                                sb.append("На \"").append(task.getName()).append("\" потрачено: ");
+                                sb.append("На \"").append(task.getName()).append("\" затрачено: ");
                                 if(hours != 0) sb.append(hours).append(" часов ");
 
                                 sb.append(minutes).append(" минут\n");
@@ -162,11 +174,7 @@ public class CallbackQueryHandler {
                         }
                     }
                     messageText = sb.toString();
-                    if (messageText.isBlank()) {
-                        messageText = "У тебя нет статистики за этот период";
-                        keyboard = Keyboards.getBackToStatsTasksKeyboard();
-                        Menu.editMenu(chatId, messageId, messageText, keyboard);
-                    } else {
+                    if (!messageText.isBlank()) {
                         InputStream fileInputStream = null;
                         try {
                             fileInputStream = histogram.generateHistogram(nameOfPeriods.get(callback[1]));
@@ -176,9 +184,13 @@ public class CallbackQueryHandler {
                         InputFile inputFile = new InputFile(fileInputStream, "histogram");
                         keyboard = Keyboards.getBackToStatsTasksKeyboardWithSave();
                         Menu.editMenuWithStats(chatId, messageId, messageText, keyboard, inputFile);
+                        break;
                     }
-                    break;
                 }
+                messageText = "Нет статистики за указанный период";
+                keyboard = Keyboards.getBackToStatsTasksKeyboard();
+                Menu.editMenu(chatId, messageId, messageText, keyboard);
+                break;
             }
 
             case "tracking":{
@@ -196,10 +208,16 @@ public class CallbackQueryHandler {
             case "delete":{
                 TasksService tasksService = new TasksService();
                 tasksService.deleteTask(Integer.parseInt(callback[1]));
-                messageText = "Здача удалена! Ты можешь продолжить удаление задач, или вернуться в меню управления задачами";
+                StringBuilder sb = new StringBuilder();
+                sb.append("Здача \"").append(callback[2]).append("\" удалена!");
 
                 List<Tasks> tasks = tasksService.findByIdUserTelegram(cbQ.getFrom().getId());
+
+                if(tasks.isEmpty()) sb.append("\n\nНет задач, которые можно удалить");
+                else sb.append("\n\nМожно продолжить удаление задач, нажатием на кнопку с название задачи, либо вернуться в меню управления");
+
                 keyboard = Keyboards.getAllTasksKeyboard("delete", tasks);
+                messageText = sb.toString();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
             }
