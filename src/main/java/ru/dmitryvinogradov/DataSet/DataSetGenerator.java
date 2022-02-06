@@ -1,4 +1,4 @@
-package ru.dmitryvinogradov;
+package ru.dmitryvinogradov.DataSet;
 
 import ru.dmitryvinogradov.Models.Tasks;
 import ru.dmitryvinogradov.Models.TimeTable;
@@ -22,7 +22,6 @@ public class DataSetGenerator {
 
         List<Timestamp> timeStartList = new LinkedList<>();
         List<Timestamp> timeStopList = new LinkedList<>();
-        List<Long> timeDiff = new LinkedList<>();
 
         int i = 0;
         long offset = timestampStart.getTime();
@@ -35,7 +34,6 @@ public class DataSetGenerator {
                     ((Timestamp.valueOf(randStop.toString()).getTime()-Timestamp.valueOf(randStart.toString()).getTime())/60000) != 0){
                 timeStartList.add(randStart);
                 timeStopList.add(randStop);
-                timeDiff.add((Timestamp.valueOf(randStop.toString()).getTime()-Timestamp.valueOf(randStart.toString()).getTime())/60000);
                 i++;
                 offset += step;
             }
@@ -46,43 +44,47 @@ public class DataSetGenerator {
         return result;
     }
 
-    public static void generateDataSetOnMonth(long idUserTelegram){
+    public static boolean generateDataSetOnMonth(long idUserTelegram){
         List<List<List<Timestamp>>> result = new LinkedList<>();
         TasksService tasksService = new TasksService();
         TimeTableService timeTableService = new TimeTableService();
-
-        String[] tasksName = {"Работа", "Учеба", "Отдых", "Спорт", "Развлечения"};
-        long[] idTasks= new long[tasksName.length];
-        for (int i = 0; i < tasksName.length; i++){
-            idTasks[i] = tasksService.saveTask(new Tasks(tasksName[i], idUserTelegram, true));
-        }
-
-        LocalDateTime nowTime = LocalDateTime.now();
-        LocalDateTime startTime = nowTime;
-        startTime = startTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
-
-        int taskOnDay = 20;
-        for(int i=30; i>0; i--){
-            result.add(generateDataSetOnFullDay(taskOnDay, startTime.minusDays(i), startTime.minusDays(i).plusDays(1)));
-        }
-        result.add(generateDataSetOnFullDay(taskOnDay, startTime, nowTime));
-        int i = 0;
-        for(List<List<Timestamp>> day : result){
-            List<Timestamp> startTimeList = day.get(0);
-            List<Timestamp> stopTimeList = day.get(1);
-            Iterator<Timestamp> iter1 = startTimeList.listIterator();
-            Iterator<Timestamp> iter2 = stopTimeList.listIterator();
-            while(iter1.hasNext() && iter2.hasNext()){
-                TimeTable timeTable = new TimeTable();
-
-                timeTable.setIdTask(idTasks[i]);
-                timeTable.setStartedAt(iter1.next());
-                timeTable.setStoppedAt(iter2.next());
-                timeTable.setStatus(false);
-                timeTableService.setTestData(timeTable);
-                i++;
-                if(i == 5) i = 0;
+        if(tasksService.findTestData(idUserTelegram).isEmpty()) {
+            String[] tasksName = {"Работа", "Учеба", "Отдых", "Спорт", "Развлечения"};
+            long[] idTasks = new long[tasksName.length];
+            for (int i = 0; i < tasksName.length; i++) {
+                idTasks[i] = tasksService.saveTask(new Tasks(tasksName[i], idUserTelegram, true));
             }
+
+            LocalDateTime nowTime = LocalDateTime.now();
+            LocalDateTime startTime = nowTime;
+            startTime = startTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+            int taskOnDay = 20;
+            for (int i = 30; i > 0; i--) {
+                result.add(generateDataSetOnFullDay(taskOnDay, startTime.minusDays(i), startTime.minusDays(i).plusDays(1)));
+            }
+            result.add(generateDataSetOnFullDay(taskOnDay, startTime, nowTime));
+            int i = 0;
+            for (List<List<Timestamp>> day : result) {
+                List<Timestamp> startTimeList = day.get(0);
+                List<Timestamp> stopTimeList = day.get(1);
+                Iterator<Timestamp> iter1 = startTimeList.listIterator();
+                Iterator<Timestamp> iter2 = stopTimeList.listIterator();
+                while (iter1.hasNext() && iter2.hasNext()) {
+                    TimeTable timeTable = new TimeTable();
+
+                    timeTable.setIdTask(idTasks[i]);
+                    timeTable.setStartedAt(iter1.next());
+                    timeTable.setStoppedAt(iter2.next());
+                    timeTable.setStatus(false);
+                    timeTableService.setTestData(timeTable);
+                    i++;
+                    if (i == 5) i = 0;
+                }
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 }
