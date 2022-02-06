@@ -20,8 +20,7 @@ public class Keyboards {
     }
 
     public static List<List<InlineKeyboardButton>> getManageTasksKeyboard(){
-        //сюда данные будт приходить из базы
-        String[] captionOnButton = new String[] {"Отслеживание задач", "Добавить задачу", "Удалить задачу", "Назад"};
+        String[] captionOnButton = new String[] {"Отслеживание задач", "Добавить задачу", "Удалить задачу", "Главное меню"};
         String[] callbackOnButton = new String[] {"tracking_task", "add_task_menu", "delete_task_menu", "start_menu"};
         return keyboardGenerator(1, captionOnButton, callbackOnButton);
     }
@@ -73,7 +72,6 @@ public class Keyboards {
     public static List<List<InlineKeyboardButton>> getAllTasksKeyboard(String type, List<Tasks> tasks){
         int count = tasks.size();
         int i = 0;
-        //TODO в зависимости от числа задач раскидать число кнопок и сделать кнопку назад одной строкой
         String[] captionOnButton = new String[count + 1];
         String[] callbackOnButton = new String[count + 1];
         StringBuilder sb = new StringBuilder();
@@ -84,7 +82,7 @@ public class Keyboards {
             i++;
             sb.setLength(0);
         }
-        captionOnButton[i] = "Назад";
+        captionOnButton[i] = "Управление задачами";
         callbackOnButton[i] = "tasks";
         return keyboardGenerator(2, captionOnButton, callbackOnButton);
     }
