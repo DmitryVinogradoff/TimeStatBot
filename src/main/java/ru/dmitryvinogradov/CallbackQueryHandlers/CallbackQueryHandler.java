@@ -84,7 +84,7 @@ public class CallbackQueryHandler {
             }
 
             case "tasks": {
-                messageText = "Управления задачами";
+                messageText = "Управление задачами";
                 keyboard = Keyboards.getManageTasksKeyboard();
                 Menu.editMenu(chatId, messageId, messageText, keyboard);
                 break;
