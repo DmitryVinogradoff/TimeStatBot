@@ -6,6 +6,7 @@ import ru.dmitryvinogradov.Models.TimeTable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TimeTableService {
     public TimeTableService() {
@@ -37,12 +38,12 @@ public class TimeTableService {
         timeTableDao.delete(id);
     }
 
-    public String taskStat(long idTask, String period){
-        Timestamp timestampNow = Timestamp.from(Instant.now());
-        Timestamp timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(1));
+    public List<String> taskStat(long idTask, String period){
+        Timestamp timestampNow = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp timestampAgo =  Timestamp.valueOf(LocalDateTime.now());
         switch (period){
             case "day":
-                timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(1));
+                timestampAgo =  Timestamp.valueOf(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0));
                 break;
             case "week":
                 timestampAgo =  Timestamp.valueOf(LocalDateTime.now().minusDays(7));

@@ -157,12 +157,17 @@ public class CallbackQueryHandler {
                     StringBuilder sb = new StringBuilder();
                     Histogram histogram = new Histogram();
                     for (Tasks task : tasks) {
-                        String taskStat = timeTableService.taskStat(task.getId(), callback[1]);
-                        if ((taskStat != null)) {
-                            String[] time = taskStat.split(":");
-                            Integer hours = Integer.parseInt(time[0]);
-                            Integer minutes = Integer.parseInt(time[1]);
-                            Integer totalTime = hours * 60 + minutes;
+                        List<String> taskStats = timeTableService.taskStat(task.getId(), callback[1]);
+                        if ((taskStats != null)) {
+                            Integer hours = 0;
+                            Integer minutes = 0;
+                            Integer totalTime = 0;
+                            for(String taskStat : taskStats) {
+                                String[] time = taskStat.split(":");
+                                hours += Integer.parseInt(time[0]);
+                                minutes += Integer.parseInt(time[1]);
+                                totalTime += hours * 60 + minutes;
+                            }
                             if(totalTime != 0){
                                 histogram.setNameTask(task.getName());
                                 histogram.setTimeTask(totalTime);

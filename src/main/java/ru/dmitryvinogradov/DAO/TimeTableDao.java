@@ -7,6 +7,7 @@ import ru.dmitryvinogradov.Models.TimeTable;
 import ru.dmitryvinogradov.utils.HibernateSessionFactoryUtil;
 
 import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TimeTableDao {
@@ -43,9 +44,10 @@ public class TimeTableDao {
         session.close();
     }
 
-    public String taskStat (long idTask, Timestamp timestampNow, Timestamp timestampAgo){
+    public List<String> taskStat (long idTask, Timestamp timestampNow, Timestamp timestampAgo){
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Query sumQuery = session
+        List<String> result = new LinkedList<>();
+        Query firstPartTime = session
                 .createQuery(
                 "SELECT TO_CHAR(SUM(stoppedAt-startedAt), 'HH24:MI') " +
                 "FROM TimeTable WHERE idTask = :idTask " +
@@ -55,10 +57,24 @@ public class TimeTableDao {
                 .setParameter("idTask", idTask)
                 .setParameter("timestampNow", timestampNow)
                 .setParameter("timestampAgo", timestampAgo);
-        List result = sumQuery.list();
+
+        Query secondPartTime = session
+                .createQuery(
+                        "SELECT TO_CHAR(SUM(stoppedAt-:timestampAgo), 'HH24:MI') " +
+                                "FROM TimeTable WHERE idTask = :idTask " +
+                                "AND stoppedAt BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
+                                "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') " +
+                                "AND startedAt NOT BETWEEN TO_TIMESTAMP(:timestampAgo, 'YYYY-MM-DD HH24:MI:SS.US') " +
+                                "AND TO_TIMESTAMP(:timestampNow, 'YYYY-MM-DD HH24:MI:SS.US') "+
+                                "GROUP BY idTask")
+                .setParameter("idTask", idTask)
+                .setParameter("timestampNow", timestampNow)
+                .setParameter("timestampAgo", timestampAgo);
+        if(!firstPartTime.list().isEmpty()) result.add(firstPartTime.list().get(0).toString());
+        if(!secondPartTime.list().isEmpty()) result.add(secondPartTime.list().get(0).toString());
         session.close();
         if(!result.isEmpty()){
-            return result.get(0).toString();
+            return result;
         } else {
             return null;
         }
