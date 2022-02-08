@@ -166,6 +166,7 @@ public class CallbackQueryHandler {
                                 String[] time = taskStat.split(":");
                                 hours += Integer.parseInt(time[0]);
                                 minutes += Integer.parseInt(time[1]);
+                                if (minutes >= 60) { hours++; minutes -=60; }
                                 totalTime += hours * 60 + minutes;
                             }
                             if(totalTime != 0){
