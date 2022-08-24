@@ -1,6 +1,6 @@
-package ru.dmitryvinogradov;
+package info.timestat;
 
-import ru.dmitryvinogradov.MessageHandlers.MessageHandler;
+import info.timestat.MessageHandlers.MessageHandler;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;

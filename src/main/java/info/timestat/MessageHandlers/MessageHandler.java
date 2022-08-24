@@ -1,9 +1,9 @@
-package ru.dmitryvinogradov.MessageHandlers;
+package info.timestat.MessageHandlers;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import static ru.dmitryvinogradov.GlobalConfig.BOT;
+import static info.timestat.GlobalConfig.BOT;
 
 public class MessageHandler {
     private Message message;

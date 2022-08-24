@@ -1,4 +1,4 @@
-package ru.dmitryvinogradov;
+package info.timestat;
 
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;

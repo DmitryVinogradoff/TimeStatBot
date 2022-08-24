@@ -34,7 +34,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ru.dmitryvinogradov.TimeStatApplication</mainClass>
+                            <mainClass>info.timestat.TimeStatApplication</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
