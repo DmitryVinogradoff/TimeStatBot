@@ -1,0 +1,13 @@
+version: '3.1'
+services:
+  app:
+    image: openjdk:17
+    container_name: TimeStatBot
+    working_dir: /app
+    volumes:
+      - type: bind
+        source: ./target
+        target: /app
+    command: java -jar app-jar-with-dependencies.jar
+    ports:
+      - 8080:8080
