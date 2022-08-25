@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Keyboards {
-    public static List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
-        String[] captionOnButton = new String[] {"Управление задачами", "Статистика", "О боте"};
-        String[] callbackOnButton = new String[] {"tasks", "stats_tasks", "about"};
-        return keyboardGenerator(1, captionOnButton, callbackOnButton);
+    private String[] captionOnButton;
+    private String[] callbackOnButton;
+
+    private void setData(String[] captionOnButton, String[] callbackOnButton) {
+        this.captionOnButton = captionOnButton;
+        this.callbackOnButton = callbackOnButton;
     }
 
-    private static List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine, String[] captionOnButton,
-                                                                      String[] callbackOnButton){
+    private List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine){
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         for(int i = 0; i < captionOnButton.length;){
             List<InlineKeyboardButton> b = new ArrayList<>();
@@ -31,4 +32,15 @@ public class Keyboards {
         }
         return buttons;
     }
+
+    public List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
+        setData(new String[] {"Управление задачами", "Статистика", "О боте"}, new String[] {"tasks", "stats_tasks", "about"});
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getBackToStartMenuKeyboard(){
+        setData(new String[] {"Назад"}, new String[] {"start_menu"});
+        return keyboardGenerator(1);
+    }
+
 }

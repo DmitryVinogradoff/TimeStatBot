@@ -1,6 +1,8 @@
 package info.timestat.MessageHandlers;
 
 import info.timestat.Keyboards.Inline.Keyboards;
+import info.timestat.Menu.Menu;
+import info.timestat.Menu.MenuText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
@@ -13,14 +15,15 @@ import static info.timestat.GlobalConfig.BOT;
 
 public class MessageHandler {
     private Message message;
-
+    private MenuText menuText = new MenuText();
+    private Keyboards keyboard = new Keyboards();
 
     public void handleMessage(Message message) throws TelegramApiException {
         this.message = message;
         if (message.hasText()) {
             if (message.hasEntities()) {
                 Optional<MessageEntity> commandEntity =
-                        message.getEntities().stream().filter(e -> "bot_command" .equals(e.getType())).findFirst();
+                        message.getEntities().stream().filter(e -> "bot_command".equals(e.getType())).findFirst();
                 if (commandEntity.isPresent()) {
                     String command = message
                             .getText()
@@ -36,14 +39,13 @@ public class MessageHandler {
     private void commandManager(String command) throws TelegramApiException {
         switch (command) {
             case "/start":
-                StringBuilder sb = new StringBuilder();
-                sb.append("Привет, ").append(message.getFrom().getFirstName()).append("!\n");
-                sb.append("Я TimeStatBot, предназначеный для учета и анализа времени, затраченного на выполнение каких-либо задач\n\n");
-                sb.append("Я помогу понять, на что было потрачено время в течении дня, недели или месяца\n\n");
                 BOT.execute(SendMessage.builder().
-                        text(sb.toString())
+                        text(menuText.getStartMenu(message.getFrom().getFirstName()))
                         .chatId(message.getChatId().toString())
-                        .replyMarkup(InlineKeyboardMarkup.builder().keyboard(Keyboards.getStartMenuKeyboard()).build())
+                        .replyMarkup(InlineKeyboardMarkup
+                                .builder()
+                                .keyboard(keyboard.getStartMenuKeyboard())
+                                .build())
                         .build());
                 break;
         }
