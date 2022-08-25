@@ -1,5 +1,6 @@
 package info.timestat;
 
+import info.timestat.CallbackQuertHandlers.CallbackQueryHandler;
 import info.timestat.MessageHandlers.MessageHandler;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -23,6 +24,12 @@ public class TimeStatBot extends TelegramLongPollingBot {
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
+                } else if (update.hasCallbackQuery()) {
+                   try {
+                       new CallbackQueryHandler().handleCallbackQuery(update.getCallbackQuery());
+                   } catch (TelegramApiException e) {
+                       e.printStackTrace();
+                   }
                 }
             }
         }).start();
