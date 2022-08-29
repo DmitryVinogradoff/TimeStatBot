@@ -4,6 +4,8 @@ services:
     image: postgres
     container_name: postgres
     restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     env_file:
       - key.env
     networks:
@@ -34,3 +36,11 @@ services:
         source: ./target
         target: /app
     command: java -jar app-jar-with-dependencies.jar
+
+networks:
+  net:
+    name: mynet
+    driver: bridge
+
+volumes:
+  pgdata:
