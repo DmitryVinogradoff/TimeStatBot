@@ -25,4 +25,20 @@ public class MenuText {
             return "У Вас нет статистики по задачам. Добавьте задачу в меню \"Управление задачами\" и начните ее отслеживание";
         }
     }
+
+    public String getTrackingTasksMenuText(boolean data) {
+        if (data){
+            return "Нажмите на названия задачи для начала отслеживания";
+        } else {
+            return "Список Ваших задач пуст";
+        }
+    }
+
+    public String getDeleteTasksMenuText(boolean data) {
+        if (data){
+            return "Нажмите на названия задачи, которую хотите удалить";
+        } else {
+            return "Список Ваших задач пуст";
+        }
+    }
 }

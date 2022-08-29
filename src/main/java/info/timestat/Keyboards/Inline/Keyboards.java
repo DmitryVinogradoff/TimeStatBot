@@ -65,4 +65,24 @@ public class Keyboards {
             return keyboardGenerator(1);
         }
     }
+
+    public List<List<InlineKeyboardButton>> getTrackingTasksKeyboard(boolean data) {
+        if (data){
+            //TODO создать клавиатуру со списком задач
+            return keyboardGenerator(3);
+        } else {
+            setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
+            return keyboardGenerator(1);
+        }
+    }
+
+    public List<List<InlineKeyboardButton>> getDeleteTasksKeyboard(boolean data) {
+        if (data){
+            //TODO создать клавиатуру со списком задач
+            return keyboardGenerator(3);
+        } else {
+            setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
+            return keyboardGenerator(1);
+        }
+    }
 }

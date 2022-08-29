@@ -40,6 +40,12 @@ public class CallbackQueryHandler {
             case "add_task":
                 addTask();
                 break;
+            case "delete_task":
+                deleteTask();
+                break;
+            case "tracking_task":
+                trackingTask();
+                break;
         }
     }
 
@@ -66,6 +72,16 @@ public class CallbackQueryHandler {
 
     private void statsTasks() throws TelegramApiException {
         menu.editMenu(chatId, messageId, menuText.getStatsTasksMenuText(false), keyboard.getStatsTasksKeyboard(false));
+        removeClock();
+    }
+
+    private void trackingTask() throws TelegramApiException {
+        menu.editMenu(chatId, messageId, menuText.getTrackingTasksMenuText(false), keyboard.getTrackingTasksKeyboard(false));
+        removeClock();
+    }
+
+    private void deleteTask() throws TelegramApiException {
+        menu.editMenu(chatId, messageId, menuText.getDeleteTasksMenuText(false), keyboard.getDeleteTasksKeyboard(false));
         removeClock();
     }
 
