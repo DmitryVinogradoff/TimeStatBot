@@ -28,24 +28,44 @@ public class CallbackQueryHandler {
             case "start_menu":
                 startMenu();
                 break;
-            case "tasks":
+            case "manage_tasks":
+                manageTasks();
                 break;
             case "stats_tasks":
+                statsTasks();
                 break;
             case "about":
                 about();
+                break;
+            case "add_task":
+                addTask();
                 break;
         }
     }
 
     private void about() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.aboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
+        menu.editMenu(chatId, messageId, menuText.getAboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
         removeClock();
     }
 
     private void startMenu() throws TelegramApiException {
         menu.editMenu(chatId, messageId, menuText.getStartMenu(callbackQuery.getFrom().getFirstName()),
                 keyboard.getStartMenuKeyboard());
+        removeClock();
+    }
+
+    private void manageTasks() throws TelegramApiException {
+        menu.editMenu(chatId, messageId, menuText.getControlTasksMenuText(), keyboard.getManageTasksKeyboard());
+        removeClock();
+    }
+
+    private void addTask() throws TelegramApiException {
+        menu.editMenu(chatId, messageId, menuText.getAddTaskMenuText(), keyboard.getBackToManageTaskKeyboard());
+        removeClock();
+    }
+
+    private void statsTasks() throws TelegramApiException {
+        menu.editMenu(chatId, messageId, menuText.getStatsTasksMenuText(false), keyboard.getStatsTasksKeyboard(false));
         removeClock();
     }
 

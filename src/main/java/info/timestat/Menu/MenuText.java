@@ -10,7 +10,19 @@ public class MenuText {
     }
 
 
-    public String aboutBotMenuText() {
+    public String getAboutBotMenuText() {
         return "© TimeStatBot 2022";
+    }
+
+    public String getControlTasksMenuText() { return "Управление задачами"; }
+
+    public String getAddTaskMenuText() { return "Напишите боту название задачи"; }
+
+    public String getStatsTasksMenuText(boolean data) {
+        if (data){
+            return "Статистика";
+        } else {
+            return "У Вас нет статистики по задачам. Добавьте задачу в меню \"Управление задачами\" и начните ее отслеживание";
+        }
     }
 }

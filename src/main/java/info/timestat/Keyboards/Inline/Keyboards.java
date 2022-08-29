@@ -34,13 +34,35 @@ public class Keyboards {
     }
 
     public List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
-        setData(new String[] {"Управление задачами", "Статистика", "О боте"}, new String[] {"tasks", "stats_tasks", "about"});
+        setData(new String[] {"Управление задачами", "Статистика", "О боте"},
+                new String[] {"manage_tasks", "stats_tasks", "about"});
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getBackToStartMenuKeyboard(){
-        setData(new String[] {"Назад"}, new String[] {"start_menu"});
+        setData(new String[] {"Главное меню"}, new String[] {"start_menu"});
         return keyboardGenerator(1);
     }
 
+    public List<List<InlineKeyboardButton>> getManageTasksKeyboard(){
+        setData(new String[] {"Отслеживание задачи", "Добавить задачу", "Удалить задачу", "Главное меню"},
+                new String[]{"tracking_task", "add_task", "delete_task", "start_menu"});
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getBackToManageTaskKeyboard(){
+        setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getStatsTasksKeyboard(boolean data){
+        if (data){
+            setData(new String[] {"За день", "За неделю", "За месяц", "Назад"},
+                    new String[] {"stats_day", "stats_week", "stats_month","manage_tasks"});
+            return keyboardGenerator(3);
+        } else {
+            setData(new String[] {"Назад"}, new String[] {"start_menu"});
+            return keyboardGenerator(1);
+        }
+    }
 }
