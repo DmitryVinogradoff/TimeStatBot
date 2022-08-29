@@ -1,13 +1,36 @@
 version: '3.1'
 services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    env_file:
+      - key.env
+    networks:
+      - net
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - net
+    ports:
+      - 8080:8080
+
   app:
     image: openjdk:17
     container_name: TimeStatBot
+    restart: always
+    depends_on:
+      - postgres
     working_dir: /app
     volumes:
       - type: bind
         source: ./target
         target: /app
     command: java -jar app-jar-with-dependencies.jar
-    ports:
-      - 8080:8080
