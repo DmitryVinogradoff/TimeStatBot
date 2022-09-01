@@ -2,6 +2,7 @@ package info.timestat.messagehandlers;
 
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.MenuText;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,8 +17,18 @@ import static info.timestat.GlobalConfig.BOT;
 @Component
 public class MessageHandler {
     private Message message;
-    private MenuText menuText = new MenuText();
-    private Keyboards keyboard = new Keyboards();
+    private MenuText menuText;
+    private Keyboards keyboard;
+
+    @Autowired
+    public void setMenuText(MenuText menuText) {
+        this.menuText = menuText;
+    }
+
+    @Autowired
+    public void setKeyboard(Keyboards keyboard) {
+        this.keyboard = keyboard;
+    }
 
     public void handleMessage(Message message) throws TelegramApiException {
         this.message = message;

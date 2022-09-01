@@ -1,5 +1,8 @@
 package info.timestat.menu;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class MenuText {
     public String getStartMenu(String userName){
         StringBuilder sb = new StringBuilder();

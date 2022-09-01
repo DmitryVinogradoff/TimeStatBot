@@ -1,30 +1,34 @@
 package info.timestat.menu;
 
+import info.timestat.TimeStatBot;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
-import static info.timestat.GlobalConfig.BOT;
-
+@Component
 public class Menu {
-    private String chatId;
-    private Integer messageId;
-    private String messageText;
-    private List<List<InlineKeyboardButton>> keyboard;
+    @Autowired
+    private TimeStatBot timeStatBot;
 
-    public void editMenu(String chatId, Integer messageId, String messageText,
+
+    private String messageText;
+    private CallbackQuery callbackQuery;
+
+    public void editMenu(CallbackQuery callbackQuery, String messageText,
                          List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException {
-        this.chatId = chatId;
-        this.messageId = messageId;
+        this.callbackQuery = callbackQuery;
         this.messageText = messageText;
-        this.keyboard = keyboard;
 
         editMessageText();
-        BOT.execute(EditMessageReplyMarkup
+        timeStatBot.execute(EditMessageReplyMarkup
                 .builder()
                 .replyMarkup(
                         InlineKeyboardMarkup
@@ -32,17 +36,26 @@ public class Menu {
                                 .keyboard(keyboard)
                                 .build()
                 )
-                .chatId(chatId)
-                .messageId(messageId)
+                .chatId(callbackQuery.getMessage().getChatId().toString())
+                .messageId(callbackQuery.getMessage().getMessageId())
                 .build());
+        removeClock();
     }
 
     private void editMessageText() throws TelegramApiException{
-        BOT.execute(EditMessageText
+        timeStatBot.execute(EditMessageText
                 .builder()
-                .chatId(chatId)
-                .messageId(messageId)
+                .chatId(callbackQuery.getMessage().getChatId().toString())
+                .messageId(callbackQuery.getMessage().getMessageId())
                 .text(messageText).parseMode("HTML")
                 .build());
+    }
+
+    private void removeClock() throws TelegramApiException {
+        timeStatBot.execute(AnswerCallbackQuery
+                .builder()
+                .callbackQueryId(callbackQuery.getId())
+                .build()
+        );
     }
 }

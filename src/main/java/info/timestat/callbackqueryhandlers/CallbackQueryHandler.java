@@ -1,32 +1,44 @@
 package info.timestat.callbackqueryhandlers;
 
+
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static info.timestat.GlobalConfig.BOT;
+
 
 @Component
 public class CallbackQueryHandler {
-    private String textCallbackQuery;
-    private String chatId;
-    private Integer messageId;
     private CallbackQuery callbackQuery;
+    private Menu menu;
+    private MenuText menuText;
+    private Keyboards keyboard;
 
-    private Menu menu = new Menu();
-    private Keyboards keyboard = new Keyboards();
-    private MenuText menuText = new MenuText();
+    @Autowired
+    public void setMenu(@Lazy Menu menu) {
+        this.menu = menu;
+    }
+
+    @Autowired
+    public void setMenuText(MenuText menuText) {
+        this.menuText = menuText;
+    }
+
+    @Autowired
+    public void setKeyboard(Keyboards keyboard) {
+        this.keyboard = keyboard;
+    }
 
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         this.callbackQuery = callbackQuery;
-        this.textCallbackQuery = callbackQuery.getData();
-        this.chatId = callbackQuery.getMessage().getChatId().toString();
-        this.messageId = callbackQuery.getMessage().getMessageId();
-        switch (this.textCallbackQuery) {
+
+        switch (callbackQuery.getData()) {
             case "start_menu":
                 startMenu();
                 break;
@@ -52,46 +64,31 @@ public class CallbackQueryHandler {
     }
 
     private void about() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getAboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
-        removeClock();
+        menu.editMenu(callbackQuery, menuText.getAboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
     }
 
     private void startMenu() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getStartMenu(callbackQuery.getFrom().getFirstName()),
+        menu.editMenu(callbackQuery, menuText.getStartMenu(callbackQuery.getFrom().getFirstName()),
                 keyboard.getStartMenuKeyboard());
-        removeClock();
     }
 
     private void manageTasks() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getControlTasksMenuText(), keyboard.getManageTasksKeyboard());
-        removeClock();
+        menu.editMenu(callbackQuery, menuText.getControlTasksMenuText(), keyboard.getManageTasksKeyboard());
     }
 
     private void addTask() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getAddTaskMenuText(), keyboard.getBackToManageTaskKeyboard());
-        removeClock();
+        menu.editMenu(callbackQuery, menuText.getAddTaskMenuText(), keyboard.getBackToManageTaskKeyboard());
     }
 
     private void statsTasks() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getStatsTasksMenuText(false), keyboard.getStatsTasksKeyboard(false));
-        removeClock();
+        menu.editMenu(callbackQuery, menuText.getStatsTasksMenuText(false), keyboard.getStatsTasksKeyboard(false));
     }
 
     private void trackingTask() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getTrackingTasksMenuText(false), keyboard.getTrackingTasksKeyboard(false));
-        removeClock();
+        menu.editMenu(callbackQuery, menuText.getTrackingTasksMenuText(false), keyboard.getTrackingTasksKeyboard(false));
     }
 
     private void deleteTask() throws TelegramApiException {
-        menu.editMenu(chatId, messageId, menuText.getDeleteTasksMenuText(false), keyboard.getDeleteTasksKeyboard(false));
-        removeClock();
-    }
-
-    private void removeClock() throws TelegramApiException {
-        BOT.execute(AnswerCallbackQuery
-                .builder()
-                .callbackQueryId(callbackQuery.getId())
-                .build()
-        );
+        menu.editMenu(callbackQuery, menuText.getDeleteTasksMenuText(false), keyboard.getDeleteTasksKeyboard(false));
     }
 }
