@@ -1,7 +1,7 @@
 package info.timestat;
 
-import info.timestat.CallbackQuertHandlers.CallbackQueryHandler;
-import info.timestat.MessageHandlers.MessageHandler;
+import info.timestat.callbackqueryhandlers.CallbackQueryHandler;
+import info.timestat.messagehandlers.MessageHandler;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;

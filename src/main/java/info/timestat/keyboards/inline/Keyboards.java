@@ -1,4 +1,4 @@
-package info.timestat.Keyboards.Inline;
+package info.timestat.keyboards.inline;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 

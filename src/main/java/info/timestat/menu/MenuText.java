@@ -1,4 +1,4 @@
-package info.timestat.Menu;
+package info.timestat.menu;
 
 public class MenuText {
     public String getStartMenu(String userName){

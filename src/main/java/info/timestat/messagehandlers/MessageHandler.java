@@ -1,8 +1,7 @@
-package info.timestat.MessageHandlers;
+package info.timestat.messagehandlers;
 
-import info.timestat.Keyboards.Inline.Keyboards;
-import info.timestat.Menu.Menu;
-import info.timestat.Menu.MenuText;
+import info.timestat.keyboards.inline.Keyboards;
+import info.timestat.menu.MenuText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;

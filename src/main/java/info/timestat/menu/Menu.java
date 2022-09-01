@@ -1,4 +1,4 @@
-package info.timestat.Menu;
+package info.timestat.menu;
 
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;

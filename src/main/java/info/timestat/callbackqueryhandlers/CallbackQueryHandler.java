@@ -1,13 +1,14 @@
-package info.timestat.CallbackQuertHandlers;
+package info.timestat.callbackqueryhandlers;
 
-import info.timestat.Keyboards.Inline.Keyboards;
-import info.timestat.Menu.Menu;
-import info.timestat.Menu.MenuText;
+import info.timestat.keyboards.inline.Keyboards;
+import info.timestat.menu.Menu;
+import info.timestat.menu.MenuText;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static info.timestat.GlobalConfig.BOT;
+
 
 public class CallbackQueryHandler {
     private String textCallbackQuery;
