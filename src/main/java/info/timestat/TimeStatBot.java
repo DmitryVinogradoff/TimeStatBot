@@ -3,11 +3,20 @@ package info.timestat;
 import info.timestat.callbackqueryhandlers.CallbackQueryHandler;
 import info.timestat.messagehandlers.MessageHandler;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Component
 public class TimeStatBot extends TelegramLongPollingBot {
+    @Autowired
+    private MessageHandler messageHandler;
+
+    @Autowired
+    private CallbackQueryHandler callbackQueryHandler;
+
     @Override
     public String getBotUsername() { return Dotenv.configure().filename("key.env").load().get("BOT_NAME"); }
 
@@ -20,13 +29,13 @@ public class TimeStatBot extends TelegramLongPollingBot {
             public void run() {
                 if (update.hasMessage()) {
                     try {
-                        new MessageHandler().handleMessage(update.getMessage());
+                        messageHandler.handleMessage(update.getMessage());
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
                 } else if (update.hasCallbackQuery()) {
                    try {
-                       new CallbackQueryHandler().handleCallbackQuery(update.getCallbackQuery());
+                       callbackQueryHandler.handleCallbackQuery(update.getCallbackQuery());
                    } catch (TelegramApiException e) {
                        e.printStackTrace();
                    }

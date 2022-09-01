@@ -3,13 +3,14 @@ package info.timestat.callbackqueryhandlers;
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static info.timestat.GlobalConfig.BOT;
 
-
+@Component
 public class CallbackQueryHandler {
     private String textCallbackQuery;
     private String chatId;
