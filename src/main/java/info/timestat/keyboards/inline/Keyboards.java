@@ -4,79 +4,81 @@ import info.timestat.entity.Task;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class Keyboards {
-    private String[] captionOnButton;
-    private String[] callbackOnButton;
-
-    private void setData(String[] captionOnButton, String[] callbackOnButton) {
-        this.captionOnButton = captionOnButton;
-        this.callbackOnButton = callbackOnButton;
-    }
+    Map<String, String> buttonsData = new LinkedHashMap<>();
 
     private List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine){
+        Iterator<Map.Entry<String, String >> iterator = buttonsData.entrySet().iterator();
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        for(int i = 0; i < captionOnButton.length;){
-            List<InlineKeyboardButton> b = new ArrayList<>();
-            for(int j = 0; j < buttonsOnLine && i < captionOnButton.length; j++){
-                if(callbackOnButton[i]!=null && !callbackOnButton[i].isBlank()) {
-                    b.add(InlineKeyboardButton
-                            .builder()
-                            .text(captionOnButton[i])
-                            .callbackData(callbackOnButton[i])
-                            .build());
-                }
-                i++;
+        while (iterator.hasNext()){
+            List<InlineKeyboardButton> buttonsLine = new ArrayList<>();
+            for(int i = 0; i < buttonsOnLine && iterator.hasNext(); i++){
+                Map.Entry<String, String> entry = iterator.next();
+                buttonsLine.add(InlineKeyboardButton
+                        .builder()
+                        .text(entry.getValue())
+                        .callbackData(entry.getKey())
+                        .build());
             }
-            buttons.add(b);
+            buttons.add(buttonsLine);
         }
         return buttons;
     }
 
     public List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
-        setData(new String[] {"Управление задачами", "Статистика", "О боте"},
-                new String[] {"manage_tasks", "stats_tasks", "about"});
+        buttonsData.clear();
+        buttonsData.put("manage_tasks", "Управление задачами");
+        buttonsData.put("stats_tasks", "Статистика");
+        buttonsData.put("about", "О боте");
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getBackToStartMenuKeyboard(){
-        setData(new String[] {"Главное меню"}, new String[] {"start_menu"});
+        buttonsData.clear();
+        buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getManageTasksKeyboard(){
-        setData(new String[] {"Отслеживание задачи", "Добавить задачу", "Удалить задачу", "Главное меню"},
-                new String[]{"tracking_task", "add_task", "delete_task", "start_menu"});
+        buttonsData.clear();
+        buttonsData.put("tracking_task", "Отслеживание задачи");
+        buttonsData.put("add_task", "Добавить задачу");
+        buttonsData.put("delete_task", "Удалить задачу");
+        buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getBackToManageTaskKeyboard(){
-        setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
+        buttonsData.clear();
+        buttonsData.put("manage_tasks", "Назад");
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getStatsTasksKeyboard(boolean data){
+        buttonsData.clear();
         if (data){
-            setData(new String[] {"За день", "За неделю", "За месяц", "Назад"},
-                    new String[] {"stats_day", "stats_week", "stats_month","manage_tasks"});
+            buttonsData.put("stats_day", "За день");
+            buttonsData.put("stats_week", "За неделю");
+            buttonsData.put("stats_month", "За месяц");
+            buttonsData.put("manage_tasks", "Назад");
             return keyboardGenerator(3);
         } else {
-            setData(new String[] {"Назад"}, new String[] {"start_menu"});
+            buttonsData.put("start_menu", "Назад");
             return keyboardGenerator(1);
         }
     }
 
     public List<List<InlineKeyboardButton>> getTrackingTasksKeyboard(boolean data) {
+
         if (data){
             //TODO создать клавиатуру со списком задач
+            buttonsData.clear();
             return keyboardGenerator(3);
         } else {
-            setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
-            return keyboardGenerator(1);
+            return getBackToManageTaskKeyboard();
         }
     }
 
@@ -88,16 +90,18 @@ public class Keyboards {
 
             }
             //TODO создать клавиатуру со списком задач
+            buttonsData.clear();
             return keyboardGenerator(3);
         } else {
-            setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
-            return keyboardGenerator(1);
+            return getBackToManageTaskKeyboard();
         }
     }
 
     public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
         //TODO добавить кнопку исправить название задачи
-        setData(new String[] {"Начать отслеживание", "Главное меню"}, new String[] {"start_task:" + id, "start_menu"});
+        buttonsData.clear();
+        buttonsData.put("start_task:" + id, "Начать отслеживание");
+        buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
 }
