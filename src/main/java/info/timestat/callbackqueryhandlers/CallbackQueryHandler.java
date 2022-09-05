@@ -1,16 +1,19 @@
 package info.timestat.callbackqueryhandlers;
 
 
+import info.timestat.entity.Task;
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
 
+import info.timestat.service.impl.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
 
 
 @Component
@@ -19,6 +22,9 @@ public class CallbackQueryHandler {
     private Menu menu;
     private MenuText menuText;
     private Keyboards keyboard;
+
+    @Autowired
+    TaskServiceImpl taskServiceImpl;
 
     @Autowired
     public void setMenu(@Lazy Menu menu) {
@@ -89,6 +95,7 @@ public class CallbackQueryHandler {
     }
 
     private void deleteTask() throws TelegramApiException {
-        menu.editMenu(callbackQuery, menuText.getDeleteTasksMenuText(false), keyboard.getDeleteTasksKeyboard(false));
+        List<Task> taskList = taskServiceImpl.getAll();
+        menu.editMenu(callbackQuery, menuText.getDeleteTasksMenuText(false), keyboard.getDeleteTasksKeyboard(taskList));
     }
 }

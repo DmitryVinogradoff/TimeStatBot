@@ -1,9 +1,11 @@
 package info.timestat.keyboards.inline;
 
+import info.timestat.entity.Task;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
@@ -78,13 +80,24 @@ public class Keyboards {
         }
     }
 
-    public List<List<InlineKeyboardButton>> getDeleteTasksKeyboard(boolean data) {
-        if (data){
+    public List<List<InlineKeyboardButton>> getDeleteTasksKeyboard(List<Task> taskList) {
+        if (!taskList.isEmpty()){
+            List<String> captionOnButton = new LinkedList<>();
+            List<String> callbackOnButton = new LinkedList<>();
+            for(Task task : taskList){
+
+            }
             //TODO создать клавиатуру со списком задач
             return keyboardGenerator(3);
         } else {
             setData(new String[] {"Назад"}, new String[] {"manage_tasks"});
             return keyboardGenerator(1);
         }
+    }
+
+    public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
+        //TODO добавить кнопку исправить название задачи
+        setData(new String[] {"Начать отслеживание", "Главное меню"}, new String[] {"start_task:" + id, "start_menu"});
+        return keyboardGenerator(1);
     }
 }
