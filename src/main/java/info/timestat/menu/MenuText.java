@@ -44,4 +44,8 @@ public class MenuText {
             return "Список Ваших задач пуст";
         }
     }
+
+    public String getAfterAddingTaskMenu(String taskName){
+        return "Задача <i><b>" + taskName + "</b></i> добавлена.\nЧтобы начать ее отслеживание нажмите кнопку \"Начать отслеживание\"";
+    }
 }
