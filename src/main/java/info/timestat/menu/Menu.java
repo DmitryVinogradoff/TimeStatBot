@@ -4,9 +4,11 @@ import info.timestat.TimeStatBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,7 +19,6 @@ import java.util.List;
 public class Menu {
     @Autowired
     private TimeStatBot timeStatBot;
-
 
     private String messageText;
     private CallbackQuery callbackQuery;
@@ -41,6 +42,19 @@ public class Menu {
                 .build());
         removeClock();
     }
+
+    public void editMenu(Message message, String messageText,
+                         List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException {
+        timeStatBot.execute(SendMessage.builder()
+                .text(messageText).parseMode("HTML")
+                .chatId(message.getChatId().toString())
+                .replyMarkup(InlineKeyboardMarkup
+                        .builder()
+                        .keyboard(keyboard)
+                        .build())
+                .build());
+    }
+
 
     private void editMessageText() throws TelegramApiException{
         timeStatBot.execute(EditMessageText

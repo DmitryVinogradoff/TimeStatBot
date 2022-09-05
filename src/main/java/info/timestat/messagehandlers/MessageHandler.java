@@ -1,24 +1,33 @@
 package info.timestat.messagehandlers;
 
+import info.timestat.entity.Task;
 import info.timestat.keyboards.inline.Keyboards;
+import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
+import info.timestat.service.impl.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
 
-import static info.timestat.GlobalConfig.BOT;
-
 @Component
 public class MessageHandler {
     private Message message;
+    private Menu menu;
     private MenuText menuText;
     private Keyboards keyboard;
+
+    @Autowired
+    TaskServiceImpl taskServiceImpl;
+
+    @Autowired
+    public void setMenu(@Lazy Menu menu) {
+        this.menu = menu;
+    }
 
     @Autowired
     public void setMenuText(MenuText menuText) {
@@ -51,19 +60,14 @@ public class MessageHandler {
     private void commandManager(String command) throws TelegramApiException {
         switch (command) {
             case "/start":
-                BOT.execute(SendMessage.builder().
-                        text(menuText.getStartMenu(message.getFrom().getFirstName()))
-                        .chatId(message.getChatId().toString())
-                        .replyMarkup(InlineKeyboardMarkup
-                                .builder()
-                                .keyboard(keyboard.getStartMenuKeyboard())
-                                .build())
-                        .build());
+                menu.editMenu(message, menuText.getStartMenu(message.getFrom().getFirstName()), keyboard.getStartMenuKeyboard());
                 break;
         }
     }
 
-    private void messageManager(String text) {
-
+    private void messageManager(String text) throws TelegramApiException {
+        //TODO сделать проверку, в какой момент приходит сообщение
+        Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
+        menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
     }
 }
