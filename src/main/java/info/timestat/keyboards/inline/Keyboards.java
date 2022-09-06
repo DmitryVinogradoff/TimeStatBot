@@ -11,6 +11,7 @@ public class Keyboards {
     Map<String, String> buttonsData = new LinkedHashMap<>();
 
     private List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine){
+        //TODO сделать кнопку Назад или какую либо другую одной на нижней строке
         Iterator<Map.Entry<String, String >> iterator = buttonsData.entrySet().iterator();
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         while (iterator.hasNext()){
@@ -30,9 +31,9 @@ public class Keyboards {
 
     public List<List<InlineKeyboardButton>> getStartMenuKeyboard(){
         buttonsData.clear();
-        buttonsData.put("manage_tasks", "Управление задачами");
-        buttonsData.put("stats_tasks", "Статистика");
-        buttonsData.put("about", "О боте");
+        buttonsData.put("manage_tasks_menu", "Управление задачами");
+        buttonsData.put("stats_tasks_menu", "Статистика");
+        buttonsData.put("about_menu", "О боте");
         return keyboardGenerator(1);
     }
 
@@ -44,16 +45,16 @@ public class Keyboards {
 
     public List<List<InlineKeyboardButton>> getManageTasksKeyboard(){
         buttonsData.clear();
-        buttonsData.put("tracking_task", "Отслеживание задачи");
-        buttonsData.put("add_task", "Добавить задачу");
-        buttonsData.put("delete_task", "Удалить задачу");
+        buttonsData.put("tracking_task_menu", "Отслеживание задачи");
+        buttonsData.put("add_task_menu", "Добавить задачу");
+        buttonsData.put("delete_task_menu", "Удалить задачу");
         buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
 
     public List<List<InlineKeyboardButton>> getBackToManageTaskKeyboard(){
         buttonsData.clear();
-        buttonsData.put("manage_tasks", "Назад");
+        buttonsData.put("manage_tasks_menu", "Назад");
         return keyboardGenerator(1);
     }
 
@@ -63,7 +64,7 @@ public class Keyboards {
             buttonsData.put("stats_day", "За день");
             buttonsData.put("stats_week", "За неделю");
             buttonsData.put("stats_month", "За месяц");
-            buttonsData.put("manage_tasks", "Назад");
+            buttonsData.put("manage_tasks_menu", "Назад");
             return keyboardGenerator(3);
         } else {
             buttonsData.put("start_menu", "Назад");
@@ -71,11 +72,13 @@ public class Keyboards {
         }
     }
 
-    public List<List<InlineKeyboardButton>> getTrackingTasksKeyboard(boolean data) {
-
-        if (data){
-            //TODO создать клавиатуру со списком задач
+    public List<List<InlineKeyboardButton>> getTrackingTasksKeyboard(List<Task> taskList) {
+        if (!taskList.isEmpty()){
             buttonsData.clear();
+            for(Task task : taskList){
+                buttonsData.put("tracking:" + task.getId(), task.getName());
+            }
+            buttonsData.put("manage_tasks_menu", "Управление задачами");
             return keyboardGenerator(3);
         } else {
             return getBackToManageTaskKeyboard();
@@ -84,13 +87,11 @@ public class Keyboards {
 
     public List<List<InlineKeyboardButton>> getDeleteTasksKeyboard(List<Task> taskList) {
         if (!taskList.isEmpty()){
-            List<String> captionOnButton = new LinkedList<>();
-            List<String> callbackOnButton = new LinkedList<>();
-            for(Task task : taskList){
-
-            }
-            //TODO создать клавиатуру со списком задач
             buttonsData.clear();
+            for(Task task : taskList){
+                buttonsData.put("delete:" + task.getId(), task.getName());
+            }
+            buttonsData.put("manage_tasks_menu", "Управление задачами");
             return keyboardGenerator(3);
         } else {
             return getBackToManageTaskKeyboard();
@@ -100,7 +101,7 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
         //TODO добавить кнопку исправить название задачи
         buttonsData.clear();
-        buttonsData.put("start_task:" + id, "Начать отслеживание");
+        buttonsData.put("start_task_menu:" + id, "Начать отслеживание");
         buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
