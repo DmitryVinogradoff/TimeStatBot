@@ -48,4 +48,12 @@ public class MenuText {
     public String getAfterAddingTaskMenu(String taskName){
         return "Задача <i><b>" + taskName + "</b></i> добавлена.\nЧтобы начать ее отслеживание нажмите кнопку \"Начать отслеживание\"";
     }
+
+    public String getAfterStartTaskMenu() {
+        return "Начато отслеживание задачи. Чтобы остановить отслеживание нажмите кнопку <i><b>\"Остановить отслеживание\"</b></i>";
+    }
+
+    public String getAfterStopTaskMenu() {
+        return "Отслеживание задачи остановлено";
+    }
 }

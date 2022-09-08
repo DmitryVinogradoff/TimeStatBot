@@ -54,7 +54,7 @@ public class Keyboards {
 
     public List<List<InlineKeyboardButton>> getBackToManageTaskKeyboard(){
         buttonsData.clear();
-        buttonsData.put("manage_tasks_menu", "Назад");
+        buttonsData.put("manage_tasks_menu", "Управление задачами");
         return keyboardGenerator(1);
     }
 
@@ -101,8 +101,14 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
         //TODO добавить кнопку исправить название задачи
         buttonsData.clear();
-        buttonsData.put("start_task_menu:" + id, "Начать отслеживание");
+        buttonsData.put("tracking:" + id, "Начать отслеживание");
         buttonsData.put("start_menu", "Главное меню");
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getAfterStartTaskKeyboard(long id) {
+        buttonsData.clear();
+        buttonsData.put("stop:" + id, "Остановить отслеживание");
         return keyboardGenerator(1);
     }
 }

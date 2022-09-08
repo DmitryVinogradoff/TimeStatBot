@@ -19,6 +19,8 @@ public class TimeTable {
     @Column(name="stopped_at")
     private Timestamp stoppedAt;
 
+    public long getId() { return id; }
+
     public long getId_task() {
         return id_task;
     }
@@ -45,9 +47,8 @@ public class TimeTable {
 
     public TimeTable() { }
 
-    public TimeTable(long id_task, Timestamp startedAt, Timestamp stoppedAt) {
+    public TimeTable(long id_task, Timestamp startedAt) {
         this.id_task = id_task;
         this.startedAt = startedAt;
-        this.stoppedAt = stoppedAt;
     }
 }

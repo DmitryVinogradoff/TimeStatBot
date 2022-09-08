@@ -81,6 +81,9 @@ public class CallbackQueryHandler {
             case "tracking":
                 startTrackingTask();
                 break;
+            case "stop":
+                stopTrackingTask();
+                break;
         }
     }
 
@@ -107,7 +110,7 @@ public class CallbackQueryHandler {
 
     private void trackingTaskMenu() throws TelegramApiException {
         List<Task> taskList = taskServiceImpl.getAll();
-        menu.editMenu(callbackQuery, menuText.getTrackingTasksMenuText(false), keyboard.getTrackingTasksKeyboard(taskList));
+        menu.editMenu(callbackQuery, menuText.getTrackingTasksMenuText(!taskList.isEmpty()), keyboard.getTrackingTasksKeyboard(taskList));
     }
 
     private void deleteTaskMenu() throws TelegramApiException {
@@ -116,14 +119,21 @@ public class CallbackQueryHandler {
     }
 
     private void deleteTask() throws TelegramApiException {
+        //TODO сделать в таблице пометку "удаленное", но не удалять
         taskServiceImpl.delete(Long.parseLong(callback[1]));
         deleteTaskMenu();
     }
 
-    private void startTrackingTask() {
-        TimeTable timeTable = new TimeTable();
-        timeTable.setId_task(Long.parseLong(callback[1]));
-        timeTable.setStartedAt(Timestamp.from(Instant.now()));
+    private void startTrackingTask() throws TelegramApiException{
+        TimeTable timeTable = new TimeTable(Long.parseLong(callback[1]), Timestamp.from(Instant.now()));
         timeTableImpl.save(timeTable);
+        menu.editMenu(callbackQuery, menuText.getAfterStartTaskMenu(), keyboard.getAfterStartTaskKeyboard(timeTable.getId()));
+    }
+
+    private void stopTrackingTask() throws TelegramApiException{
+        TimeTable timeTable = timeTableImpl.findById(Long.parseLong(callback[1])).get();
+        timeTable.setStoppedAt(Timestamp.from(Instant.now()));
+        timeTableImpl.save(timeTable);
+        menu.editMenu(callbackQuery, menuText.getAfterStopTaskMenu(), keyboard.getBackToManageTaskKeyboard());
     }
 }

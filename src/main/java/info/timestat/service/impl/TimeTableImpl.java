@@ -6,6 +6,8 @@ import info.timestat.service.TimeTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class TimeTableImpl implements TimeTableService {
     @Autowired
@@ -18,5 +20,10 @@ public class TimeTableImpl implements TimeTableService {
     public TimeTable save(TimeTable timeTable) { return timeTableRepository.save(timeTable); }
 
     @Override
-    public void delete(Long id) { timeTableRepository.deleteById(id); }
+    public void delete(long id) { timeTableRepository.deleteById(id); }
+
+    @Override
+    public Optional<TimeTable> findById(long id) {
+        return timeTableRepository.findById(id);
+    }
 }
