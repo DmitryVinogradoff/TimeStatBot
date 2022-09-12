@@ -67,7 +67,13 @@ public class MessageHandler {
 
     private void messageManager(String text) throws TelegramApiException {
         //TODO сделать проверку, в какой момент приходит сообщение
-        Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
-        menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
+        Optional<Task> optionalTask = taskServiceImpl.getByIdUserTelegramAndName(message.getFrom().getId(), text);
+        if(!optionalTask.isPresent()){
+            Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
+            menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
+        } else {
+            menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(text, optionalTask.get().getId()));
+        }
+
     }
 }

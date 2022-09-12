@@ -69,4 +69,8 @@ public class MenuText {
         }
         return sb.toString();
     }
+
+    public String getTaskIsAlreadyPresentMenu(String taskName) {
+        return "Задача <i><b>" + taskName + "</b></i> уже существует.\nЧтобы начать её отслеживание нажмите кнопку <i><b>«Начать отслеживание»</b></i>";
+    }
 }

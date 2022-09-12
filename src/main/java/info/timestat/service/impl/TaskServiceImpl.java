@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -32,4 +33,11 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getAllByIdUserTelegram(Long id) {
         return taskRepository.findAllByIdUserTelegram(id);
     }
+
+    @Override
+    public Optional<Task> getByIdUserTelegramAndName(Long id, String name) {
+        return taskRepository.findByIdUserTelegramAndName(id, name);
+    }
+
+
 }

@@ -149,7 +149,6 @@ public class CallbackQueryHandler {
         List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         List<TimeTable> timeTables;
         //TODO пока что выдаю имеющуюся статистику, сдлеать за день, месяц, год
-        //TODO было бы хорошо прикрутить мапу, но названия задач могут повторяться (сделать при добавление проверку на повтор)
         Map<String, Long> stats = new LinkedHashMap<String, Long>();
         for(Task task : taskList){
             timeTables = timeTableServiceImpl.getByIdTask(task.getId());
