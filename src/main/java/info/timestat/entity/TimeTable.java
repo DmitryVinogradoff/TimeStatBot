@@ -11,7 +11,7 @@ public class TimeTable {
     private long id;
 
     @Column(name="id_task")
-    private long id_task;
+    private long idTask;
 
     @Column(name="started_at")
     private Timestamp startedAt;
@@ -21,12 +21,12 @@ public class TimeTable {
 
     public long getId() { return id; }
 
-    public long getId_task() {
-        return id_task;
+    public long getIdTask() {
+        return idTask;
     }
 
-    public void setId_task(long id_task) {
-        this.id_task = id_task;
+    public void setIdTask(long id_task) {
+        this.idTask = idTask;
     }
 
     public Timestamp getStartedAt() {
@@ -47,8 +47,8 @@ public class TimeTable {
 
     public TimeTable() { }
 
-    public TimeTable(long id_task, Timestamp startedAt) {
-        this.id_task = id_task;
+    public TimeTable(long idTask, Timestamp startedAt) {
+        this.idTask = idTask;
         this.startedAt = startedAt;
     }
 }
