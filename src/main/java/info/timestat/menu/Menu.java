@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -71,5 +72,13 @@ public class Menu {
                 .callbackQueryId(callbackQuery.getId())
                 .build()
         );
+    }
+
+    public void deleteMessage(Message message) throws TelegramApiException {
+        timeStatBot.execute(DeleteMessage
+                .builder()
+                .chatId(message.getChatId().toString())
+                .messageId(message.getMessageId())
+                .build());
     }
 }

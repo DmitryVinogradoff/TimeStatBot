@@ -5,6 +5,8 @@ import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
 import info.timestat.service.impl.TaskServiceImpl;
+import info.timestat.statemachine.CurrentState;
+import info.timestat.statemachine.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,9 @@ public class MessageHandler {
     private Menu menu;
     private MenuText menuText;
     private Keyboards keyboard;
+
+    @Autowired
+    CurrentState currentState;
 
     @Autowired
     TaskServiceImpl taskServiceImpl;
@@ -66,13 +71,17 @@ public class MessageHandler {
     }
 
     private void messageManager(String text) throws TelegramApiException {
-        //TODO сделать проверку, в какой момент приходит сообщение
-        Optional<Task> optionalTask = taskServiceImpl.getByIdUserTelegramAndName(message.getFrom().getId(), text);
-        if(!optionalTask.isPresent()){
-            Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
-            menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
+        if(currentState.getState().equals(State.DEFAULT)){
+            menu.deleteMessage(message);
         } else {
-            menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(text, optionalTask.get().getId()));
+            Optional<Task> optionalTask = taskServiceImpl.getByIdUserTelegramAndName(message.getFrom().getId(), text);
+            if (!optionalTask.isPresent()) {
+                Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
+                menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
+            } else {
+                menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(text, optionalTask.get().getId()));
+            }
+            currentState.setState(State.DEFAULT);
         }
 
     }

@@ -9,6 +9,8 @@ import info.timestat.menu.MenuText;
 
 import info.timestat.service.impl.TaskServiceImpl;
 import info.timestat.service.impl.TimeTableServiceImpl;
+import info.timestat.statemachine.CurrentState;
+import info.timestat.statemachine.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,9 @@ public class CallbackQueryHandler {
     private Keyboards keyboard;
     private  String[] callback;
     private long idUserTelegram;
+
+    @Autowired
+    CurrentState currentState;
 
     @Autowired
     TaskServiceImpl taskServiceImpl;
@@ -104,10 +109,13 @@ public class CallbackQueryHandler {
     }
 
     private void manageTasksMenu() throws TelegramApiException {
+        currentState.setState(State.DEFAULT); // меняем состояние, потому что пользователь мог не вводить назваие задачи,
+                                             // а вернуться по кнопке "Управление задачами"
         menu.editMenu(callbackQuery, menuText.getControlTasksMenuText(), keyboard.getManageTasksKeyboard());
     }
 
     private void addTaskMenu() throws TelegramApiException {
+        currentState.setState(State.ADDINGTASK);
         menu.editMenu(callbackQuery, menuText.getAddTaskMenuText(), keyboard.getBackToManageTaskKeyboard());
     }
 
