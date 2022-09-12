@@ -27,4 +27,9 @@ public class TaskServiceImpl implements TaskService {
     public void delete(Long id) {
         taskRepository.deleteById(id);
     }
+
+    @Override
+    public List<Task> getAllByIdUserTelegram(Long id) {
+        return taskRepository.findAllByIdUserTelegram(id);
+    }
 }

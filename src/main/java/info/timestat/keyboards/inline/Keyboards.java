@@ -61,10 +61,10 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getStatsTasksKeyboard(boolean data){
         buttonsData.clear();
         if (data){
-            buttonsData.put("stats_day", "За день");
-            buttonsData.put("stats_week", "За неделю");
-            buttonsData.put("stats_month", "За месяц");
-            buttonsData.put("manage_tasks_menu", "Назад");
+            buttonsData.put("stats:day", "За день");
+            buttonsData.put("stats:week", "За неделю");
+            buttonsData.put("stats:month", "За месяц");
+            buttonsData.put("start_menu", "Главное меню");
             return keyboardGenerator(3);
         } else {
             buttonsData.put("start_menu", "Назад");
@@ -109,6 +109,12 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getAfterStartTaskKeyboard(long id) {
         buttonsData.clear();
         buttonsData.put("stop:" + id, "Остановить отслеживание");
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getBackToAllStatsMenuKeyboard() {
+        buttonsData.clear();
+        buttonsData.put("stats_tasks_menu", "Назад");
         return keyboardGenerator(1);
     }
 }

@@ -8,4 +8,5 @@ public interface TaskService {
     List<Task> getAll();
     Task save(Task task);
     void delete(Long id);
+    List<Task> getAllByIdUserTelegram(Long id);
 }

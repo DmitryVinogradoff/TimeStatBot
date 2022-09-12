@@ -8,7 +8,7 @@ import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
 
 import info.timestat.service.impl.TaskServiceImpl;
-import info.timestat.service.impl.TimeTableImpl;
+import info.timestat.service.impl.TimeTableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -27,12 +29,13 @@ public class CallbackQueryHandler {
     private MenuText menuText;
     private Keyboards keyboard;
     private  String[] callback;
+    private long idUserTelegram;
 
     @Autowired
     TaskServiceImpl taskServiceImpl;
 
     @Autowired
-    TimeTableImpl timeTableImpl;
+    TimeTableServiceImpl timeTableServiceImpl;
 
     @Autowired
     public void setMenu(@Lazy Menu menu) {
@@ -51,6 +54,7 @@ public class CallbackQueryHandler {
 
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         this.callbackQuery = callbackQuery;
+        idUserTelegram = callbackQuery.getFrom().getId();
         this.callback = callbackQuery.getData().split(":");
 
         switch (callback[0]) {
@@ -84,6 +88,9 @@ public class CallbackQueryHandler {
             case "stop":
                 stopTrackingTask();
                 break;
+            case "stats":
+                statsFromPeriod();
+                break;
         }
     }
 
@@ -105,16 +112,17 @@ public class CallbackQueryHandler {
     }
 
     private void statsTasksMenu() throws TelegramApiException {
-        menu.editMenu(callbackQuery, menuText.getStatsTasksMenuText(false), keyboard.getStatsTasksKeyboard(false));
+        List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
+        menu.editMenu(callbackQuery, menuText.getStatsTasksMenuText(!taskList.isEmpty()), keyboard.getStatsTasksKeyboard(!taskList.isEmpty()));
     }
 
     private void trackingTaskMenu() throws TelegramApiException {
-        List<Task> taskList = taskServiceImpl.getAll();
+        List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         menu.editMenu(callbackQuery, menuText.getTrackingTasksMenuText(!taskList.isEmpty()), keyboard.getTrackingTasksKeyboard(taskList));
     }
 
     private void deleteTaskMenu() throws TelegramApiException {
-        List<Task> taskList = taskServiceImpl.getAll();
+        List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         menu.editMenu(callbackQuery, menuText.getDeleteTasksMenuText(!taskList.isEmpty()), keyboard.getDeleteTasksKeyboard(taskList));
     }
 
@@ -126,14 +134,32 @@ public class CallbackQueryHandler {
 
     private void startTrackingTask() throws TelegramApiException{
         TimeTable timeTable = new TimeTable(Long.parseLong(callback[1]), Timestamp.from(Instant.now()));
-        timeTableImpl.save(timeTable);
+        timeTableServiceImpl.save(timeTable);
         menu.editMenu(callbackQuery, menuText.getAfterStartTaskMenu(), keyboard.getAfterStartTaskKeyboard(timeTable.getId()));
     }
 
     private void stopTrackingTask() throws TelegramApiException{
-        TimeTable timeTable = timeTableImpl.findById(Long.parseLong(callback[1])).get();
+        TimeTable timeTable = timeTableServiceImpl.getById(Long.parseLong(callback[1])).get();
         timeTable.setStoppedAt(Timestamp.from(Instant.now()));
-        timeTableImpl.save(timeTable);
+        timeTableServiceImpl.save(timeTable);
         menu.editMenu(callbackQuery, menuText.getAfterStopTaskMenu(), keyboard.getBackToManageTaskKeyboard());
+    }
+
+    private void statsFromPeriod() throws TelegramApiException {
+        List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
+        List<TimeTable> timeTables;
+        //TODO пока что выдаю имеющуюся статистику, сдлеать за день, месяц, год
+        //TODO было бы хорошо прикрутить мапу, но названия задач могут повторяться (сделать при добавление проверку на повтор)
+        Map<String, Long> stats = new LinkedHashMap<String, Long>();
+        for(Task task : taskList){
+            timeTables = timeTableServiceImpl.getByIdTask(task.getId());
+            long totalTime = 0;
+            for(TimeTable timeTable : timeTables){
+                totalTime += timeTable.getStoppedAt().getTime() - timeTable.getStartedAt().getTime();
+
+            }
+            stats.put(task.getName(), totalTime);
+        }
+        menu.editMenu(callbackQuery, menuText.getWithStatsMenuText(stats), keyboard.getBackToAllStatsMenuKeyboard());
     }
 }

@@ -1,6 +1,8 @@
 package info.timestat.menu;
 
 import org.springframework.stereotype.Component;
+import java.util.Iterator;
+import java.util.Map;
 
 @Component
 public class MenuText {
@@ -23,9 +25,9 @@ public class MenuText {
 
     public String getStatsTasksMenuText(boolean data) {
         if (data){
-            return "Статистика";
+            return "Выберите период, за которых хотите просмотреть статистику";
         } else {
-            return "У Вас нет статистики по задачам. Добавьте задачу в меню \"Управление задачами\" и начните ее отслеживание";
+            return "У Вас нет статистики по задачам. Добавьте задачу в меню <i><b>«Управление задачами»</b></i> и начните ее отслеживание";
         }
     }
 
@@ -33,7 +35,7 @@ public class MenuText {
         if (data){
             return "Нажмите на названия задачи для начала отслеживания";
         } else {
-            return "Список Ваших задач пуст";
+            return "Список Ваших задач пуст. Добавьте задачи в меню <i><b>«Управление задачами»</b></i>";
         }
     }
 
@@ -46,14 +48,25 @@ public class MenuText {
     }
 
     public String getAfterAddingTaskMenu(String taskName){
-        return "Задача <i><b>" + taskName + "</b></i> добавлена.\nЧтобы начать ее отслеживание нажмите кнопку \"Начать отслеживание\"";
+        return "Задача <i><b>" + taskName + "</b></i> добавлена.\nЧтобы начать её отслеживание нажмите кнопку <i><b>«Начать отслеживание»</b></i>";
     }
 
     public String getAfterStartTaskMenu() {
-        return "Начато отслеживание задачи. Чтобы остановить отслеживание нажмите кнопку <i><b>\"Остановить отслеживание\"</b></i>";
+        return "Начато отслеживание задачи. Чтобы остановить отслеживание нажмите кнопку <i><b>«Остановить отслеживание»</b></i>";
     }
 
     public String getAfterStopTaskMenu() {
         return "Отслеживание задачи остановлено";
+    }
+
+    public String getWithStatsMenuText(Map<String, Long> stats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Статистика по задачам: \n");
+        Iterator<Map.Entry<String, Long>> iterator = stats.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String, Long> entry = iterator.next();
+            sb.append("<b><i>").append(entry.getKey()).append(":</i></b> ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
     }
 }
