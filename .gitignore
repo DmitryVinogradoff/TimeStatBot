@@ -3,3 +3,4 @@ src/test
 *.env
 target
 *.iml
+*.properties
