@@ -11,7 +11,6 @@ public class Keyboards {
     Map<String, String> buttonsData = new LinkedHashMap<>();
 
     private List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine){
-        //TODO сделать кнопку Назад или какую либо другую одной на нижней строке
         Iterator<Map.Entry<String, String >> iterator = buttonsData.entrySet().iterator();
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         while (iterator.hasNext()){
@@ -99,7 +98,6 @@ public class Keyboards {
     }
 
     public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
-        //TODO добавить кнопку исправить название задачи
         buttonsData.clear();
         buttonsData.put("tracking:" + id, "Начать отслеживание");
         buttonsData.put("start_menu", "Главное меню");

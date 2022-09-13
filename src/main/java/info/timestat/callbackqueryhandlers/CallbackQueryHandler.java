@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 
@@ -64,39 +63,17 @@ public class CallbackQueryHandler {
         this.callback = callbackQuery.getData().split(":");
 
         switch (callback[0]) {
-            case "start_menu":
-                startMenu();
-                break;
-            case "manage_tasks_menu":
-                manageTasksMenu();
-                break;
-            case "stats_tasks_menu":
-                statsTasksMenu();
-                break;
-            case "about_menu":
-                aboutMenu();
-                break;
-            case "add_task_menu":
-                addTaskMenu();
-                break;
-            case "delete_task_menu":
-                deleteTaskMenu();
-                break;
-            case "tracking_task_menu":
-                trackingTaskMenu();
-                break;
-            case "delete":
-                deleteTask();
-                break;
-            case "tracking":
-                startTrackingTask();
-                break;
-            case "stop":
-                stopTrackingTask();
-                break;
-            case "stats":
-                statsFromPeriod();
-                break;
+            case "start_menu" -> startMenu();
+            case "manage_tasks_menu" -> manageTasksMenu();
+            case "stats_tasks_menu" -> statsTasksMenu();
+            case "about_menu" -> aboutMenu();
+            case "add_task_menu" -> addTaskMenu();
+            case "delete_task_menu" -> deleteTaskMenu();
+            case "tracking_task_menu" -> trackingTaskMenu();
+            case "delete" -> deleteTask();
+            case "tracking" -> startTrackingTask();
+            case "stop" -> stopTrackingTask();
+            case "stats" -> statsFromPeriod();
         }
     }
 
@@ -136,7 +113,6 @@ public class CallbackQueryHandler {
     }
 
     private void deleteTask() throws TelegramApiException {
-        //TODO сделать в таблице пометку "удаленное", но не удалять
         taskServiceImpl.delete(Long.parseLong(callback[1]));
         deleteTaskMenu();
     }
@@ -148,6 +124,7 @@ public class CallbackQueryHandler {
     }
 
     private void stopTrackingTask() throws TelegramApiException{
+        //не проверяем на наличие записи, потому что мы останавливаем(редактируем) уже существующую запись
         TimeTable timeTable = timeTableServiceImpl.getById(Long.parseLong(callback[1])).get();
         timeTable.setStoppedAt(Timestamp.from(Instant.now()));
         timeTableServiceImpl.save(timeTable);
@@ -157,33 +134,27 @@ public class CallbackQueryHandler {
     private void statsFromPeriod() throws TelegramApiException {
         List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         List<TimeTable> timeTables;
-        //TODO пока что выдаю имеющуюся статистику, сдлеать за день, месяц, год
-        LocalDateTime localDateTimeNow = LocalDateTime.now();
-        LocalDateTime localDateTimeQuery = localDateTimeNow.with(LocalTime.of(0,0,0));
-        List<TimeTable> list = new ArrayList<>();
+        LocalDateTime localDateTimeQuery = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         switch(callback[1]){
             case "day":
-                //localDateTimeQuery = localDateTimeNow.with(LocalTime.of(0,0,0));
                 break;
             case "week":
-                if (!localDateTimeNow.getDayOfWeek().equals(DayOfWeek.MONDAY)){
                     localDateTimeQuery = localDateTimeQuery.with(DayOfWeek.MONDAY);
-                    list = timeTableServiceImpl.getByIdTaskAndStartedAtAfter((long)77, Timestamp.valueOf(localDateTimeQuery));
-                }
                 break;
             case "month":
+                    localDateTimeQuery = localDateTimeQuery.withDayOfMonth(1);
                 break;
         }
 
-        Map<String, Long> stats = new LinkedHashMap<String, Long>();
+        Map<String, Long> stats = new LinkedHashMap<>();
         for(Task task : taskList){
-            timeTables = timeTableServiceImpl.getByIdTask(task.getId());
+            timeTables = timeTableServiceImpl.getByIdTaskAndStartedAtAfter(task.getId(), Timestamp.valueOf(localDateTimeQuery));
             long totalTime = 0;
             for(TimeTable timeTable : timeTables){
                 totalTime += timeTable.getStoppedAt().getTime() - timeTable.getStartedAt().getTime();
-
             }
-            stats.put(task.getName(), totalTime);
+            if (totalTime != 0)
+                stats.put(task.getName(), totalTime);
         }
         menu.editMenu(callbackQuery, menuText.getWithStatsMenuText(stats), keyboard.getBackToAllStatsMenuKeyboard());
     }
