@@ -18,10 +18,11 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 
 @Component
@@ -157,6 +158,23 @@ public class CallbackQueryHandler {
         List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         List<TimeTable> timeTables;
         //TODO пока что выдаю имеющуюся статистику, сдлеать за день, месяц, год
+        LocalDateTime localDateTimeNow = LocalDateTime.now();
+        LocalDateTime localDateTimeQuery = localDateTimeNow.with(LocalTime.of(0,0,0));
+        List<TimeTable> list = new ArrayList<>();
+        switch(callback[1]){
+            case "day":
+                //localDateTimeQuery = localDateTimeNow.with(LocalTime.of(0,0,0));
+                break;
+            case "week":
+                if (!localDateTimeNow.getDayOfWeek().equals(DayOfWeek.MONDAY)){
+                    localDateTimeQuery = localDateTimeQuery.with(DayOfWeek.MONDAY);
+                    list = timeTableServiceImpl.getByIdTaskAndStartedAtAfter((long)77, Timestamp.valueOf(localDateTimeQuery));
+                }
+                break;
+            case "month":
+                break;
+        }
+
         Map<String, Long> stats = new LinkedHashMap<String, Long>();
         for(Task task : taskList){
             timeTables = timeTableServiceImpl.getByIdTask(task.getId());
