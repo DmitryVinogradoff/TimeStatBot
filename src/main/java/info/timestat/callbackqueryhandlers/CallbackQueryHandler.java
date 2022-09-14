@@ -3,6 +3,7 @@ package info.timestat.callbackqueryhandlers;
 
 import info.timestat.entity.Task;
 import info.timestat.entity.TimeTable;
+import info.timestat.histograms.Histogram;
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
 import info.timestat.menu.MenuText;
@@ -15,10 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,7 +61,7 @@ public class CallbackQueryHandler {
         this.keyboard = keyboard;
     }
 
-    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException, IOException {
         this.callbackQuery = callbackQuery;
         idUserTelegram = callbackQuery.getFrom().getId();
         this.callback = callbackQuery.getData().split(":");
@@ -131,31 +135,35 @@ public class CallbackQueryHandler {
         menu.editMenu(callbackQuery, menuText.getAfterStopTaskMenu(), keyboard.getBackToManageTaskKeyboard());
     }
 
-    private void statsFromPeriod() throws TelegramApiException {
+    private void statsFromPeriod() throws TelegramApiException, IOException {
         List<Task> taskList = taskServiceImpl.getAllByIdUserTelegram(idUserTelegram);
         List<TimeTable> timeTables;
         LocalDateTime localDateTimeQuery = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        switch(callback[1]){
-            case "day":
-                break;
-            case "week":
-                    localDateTimeQuery = localDateTimeQuery.with(DayOfWeek.MONDAY);
-                break;
-            case "month":
-                    localDateTimeQuery = localDateTimeQuery.withDayOfMonth(1);
-                break;
+        String titleHistogram = "";
+        switch (callback[1]) {
+            case "day" -> titleHistogram = "Статистика за день";
+            case "week" -> {
+                titleHistogram = "Статистика за неделю";
+                localDateTimeQuery = localDateTimeQuery.with(DayOfWeek.MONDAY);
+            }
+            case "month" -> {
+                titleHistogram = "Статистика за месяц";
+                localDateTimeQuery = localDateTimeQuery.withDayOfMonth(1);
+            }
         }
 
-        Map<String, Long> stats = new LinkedHashMap<>();
+        Map<String, Duration> stats = new LinkedHashMap<>();
         for(Task task : taskList){
             timeTables = timeTableServiceImpl.getByIdTaskAndStartedAtAfter(task.getId(), Timestamp.valueOf(localDateTimeQuery));
-            long totalTime = 0;
+            Duration duration = Duration.ZERO;
             for(TimeTable timeTable : timeTables){
-                totalTime += timeTable.getStoppedAt().getTime() - timeTable.getStartedAt().getTime();
+                duration = duration.plus(Duration.between(timeTable.getStartedAt().toInstant(), timeTable.getStoppedAt().toInstant()));
             }
-            if (totalTime != 0)
-                stats.put(task.getName(), totalTime);
+            if (!duration.isZero())
+                stats.put(task.getName(), duration);
         }
-        menu.editMenu(callbackQuery, menuText.getWithStatsMenuText(stats), keyboard.getBackToAllStatsMenuKeyboard());
+
+        InputFile inputFile = new InputFile(Histogram.generateHistogram(stats, titleHistogram), "histogram");
+        menu.editMenu(callbackQuery, menuText.getWithStatsMenuText(stats, callback[1]), keyboard.getBackToAllStatsMenuKeyboard(), inputFile);
     }
 }

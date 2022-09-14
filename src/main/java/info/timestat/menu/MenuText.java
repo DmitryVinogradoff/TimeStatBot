@@ -1,6 +1,8 @@
 package info.timestat.menu;
 
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -59,13 +61,17 @@ public class MenuText {
         return "Отслеживание задачи остановлено";
     }
 
-    public String getWithStatsMenuText(Map<String, Long> stats) {
+    public String getWithStatsMenuText(Map<String, Duration> stats, String period) {
         StringBuilder sb = new StringBuilder();
         sb.append("Статистика по задачам: \n");
-        Iterator<Map.Entry<String, Long>> iterator = stats.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry<String, Long> entry = iterator.next();
-            sb.append("<b><i>").append(entry.getKey()).append(":</i></b> ").append(entry.getValue()).append("\n");
+        for (Map.Entry<String, Duration> entry : stats.entrySet()) {
+            sb.append("<b><i>").append(entry.getKey()).append(":</i></b> ");
+
+            if (!period.equals("day")) sb.append(entry.getValue().toDaysPart()).append(" дней ");
+
+            sb.append(entry.getValue().toHoursPart()).append(" часов ")
+                    .append(entry.getValue().toMinutesPart()).append(" минут")
+                    .append("\n");
         }
         return sb.toString();
     }

@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -23,6 +25,19 @@ public class Menu {
 
     private String messageText;
     private CallbackQuery callbackQuery;
+
+    public void editMenu(CallbackQuery callbackQuery, String messageText,
+                         List<List<InlineKeyboardButton>> keyboard, InputFile inputFile) throws TelegramApiException {
+        timeStatBot.execute(SendPhoto
+                .builder()
+                .chatId(callbackQuery.getFrom().getId().toString())
+                .photo(inputFile)
+                .build()
+        );
+        deleteMessage(callbackQuery.getMessage()); //удаляем меню над гистограммой
+        editMenu(callbackQuery.getMessage(), messageText, keyboard); //выводим новое меню под гистограммой
+        removeClock();
+    }
 
     public void editMenu(CallbackQuery callbackQuery, String messageText,
                          List<List<InlineKeyboardButton>> keyboard) throws TelegramApiException {

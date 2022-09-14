@@ -9,6 +9,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
+
 @Component
 public class TimeStatBot extends TelegramLongPollingBot {
     @Autowired
@@ -36,7 +38,7 @@ public class TimeStatBot extends TelegramLongPollingBot {
                 } else if (update.hasCallbackQuery()) {
                    try {
                        callbackQueryHandler.handleCallbackQuery(update.getCallbackQuery());
-                   } catch (TelegramApiException e) {
+                   } catch (TelegramApiException | IOException e) {
                        e.printStackTrace();
                    }
                 }
