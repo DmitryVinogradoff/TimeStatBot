@@ -13,6 +13,7 @@ public class Keyboards {
     private List<List<InlineKeyboardButton>> keyboardGenerator(int buttonsOnLine){
         Iterator<Map.Entry<String, String >> iterator = buttonsData.entrySet().iterator();
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        int j = 0;
         while (iterator.hasNext()){
             List<InlineKeyboardButton> buttonsLine = new ArrayList<>();
             for(int i = 0; i < buttonsOnLine && iterator.hasNext(); i++){
@@ -22,6 +23,8 @@ public class Keyboards {
                         .text(entry.getValue())
                         .callbackData(entry.getKey())
                         .build());
+                j++;
+                if (j >= buttonsData.size() - 1) break;
             }
             buttons.add(buttonsLine);
         }
@@ -78,7 +81,7 @@ public class Keyboards {
                 buttonsData.put("tracking:" + task.getId(), task.getName());
             }
             buttonsData.put("manage_tasks_menu", "Управление задачами");
-            return keyboardGenerator(3);
+            return keyboardGenerator(2);
         } else {
             return getBackToManageTaskKeyboard();
         }
@@ -91,7 +94,7 @@ public class Keyboards {
                 buttonsData.put("delete:" + task.getId(), task.getName());
             }
             buttonsData.put("manage_tasks_menu", "Управление задачами");
-            return keyboardGenerator(3);
+            return keyboardGenerator(2);
         } else {
             return getBackToManageTaskKeyboard();
         }
