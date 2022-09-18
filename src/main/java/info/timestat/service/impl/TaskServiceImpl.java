@@ -39,5 +39,10 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByIdUserTelegramAndName(id, name);
     }
 
+    @Override
+    public Task getLastAddedTask(Long id) {
+        return taskRepository.findTopByIdUserTelegramOrderByIdDesc(id);
+    }
+
 
 }

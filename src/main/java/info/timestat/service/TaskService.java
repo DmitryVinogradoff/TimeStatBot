@@ -11,4 +11,5 @@ public interface TaskService {
     void delete(Long id);
     List<Task> getAllByIdUserTelegram(Long id);
     Optional<Task> getByIdUserTelegramAndName(Long id, String name);
+    Task getLastAddedTask(Long id);
 }

@@ -73,7 +73,7 @@ public class MessageHandler {
     private void messageManager(String text) throws TelegramApiException {
         if(currentState.getState().equals(State.DEFAULT)){
             menu.deleteMessage(message);
-        } else {
+        } else if (currentState.getState().equals(State.ADDINGTASK)) {
             Optional<Task> optionalTask = taskServiceImpl.getByIdUserTelegramAndName(message.getFrom().getId(), text);
             if (!optionalTask.isPresent()) {
                 Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
@@ -81,6 +81,11 @@ public class MessageHandler {
             } else {
                 menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(text, optionalTask.get().getId()));
             }
+            currentState.setState(State.DEFAULT);
+        } else if (currentState.getState().equals(State.RENAMETASK)) {
+            Task task = taskServiceImpl.getLastAddedTask(message.getFrom().getId());
+            task.setName(message.getText());
+            taskServiceImpl.save(task);
             currentState.setState(State.DEFAULT);
         }
 

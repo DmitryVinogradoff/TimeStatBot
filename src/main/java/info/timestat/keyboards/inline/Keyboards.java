@@ -103,6 +103,7 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
         buttonsData.clear();
         buttonsData.put("tracking:" + id, "Начать отслеживание");
+        buttonsData.put("change_name", "Исправить название задачи");
         buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }

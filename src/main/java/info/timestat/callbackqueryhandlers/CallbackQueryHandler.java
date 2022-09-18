@@ -72,17 +72,21 @@ public class CallbackQueryHandler {
             case "stats_tasks_menu" -> statsTasksMenu();
             case "about_menu" -> aboutMenu();
             case "add_task_menu" -> addTaskMenu();
+            case "change_name" -> changeNameTask();
             case "delete_task_menu" -> deleteTaskMenu();
             case "tracking_task_menu" -> trackingTaskMenu();
             case "delete" -> deleteTask();
             case "tracking" -> startTrackingTask();
             case "stop" -> stopTrackingTask();
             case "stats" -> statsFromPeriod();
+
         }
     }
 
     private void aboutMenu() throws TelegramApiException {
         menu.editMenu(callbackQuery, menuText.getAboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
+        Task task = taskServiceImpl.getLastAddedTask(callbackQuery.getFrom().getId());
+        int k=0;
     }
 
     private void startMenu() throws TelegramApiException {
@@ -99,6 +103,10 @@ public class CallbackQueryHandler {
     private void addTaskMenu() throws TelegramApiException {
         currentState.setState(State.ADDINGTASK);
         menu.editMenu(callbackQuery, menuText.getAddTaskMenuText(), keyboard.getBackToManageTaskKeyboard());
+    }
+
+    private void changeNameTask() throws TelegramApiException{
+        currentState.setState(State.RENAMETASK);
     }
 
     private void statsTasksMenu() throws TelegramApiException {
