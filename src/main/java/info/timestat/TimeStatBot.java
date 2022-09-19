@@ -1,7 +1,7 @@
 package info.timestat;
 
-import info.timestat.callbackqueryhandlers.CallbackQueryHandler;
-import info.timestat.messagehandlers.MessageHandler;
+import info.timestat.callbackquery.handlers.CallbackQueryHandler;
+import info.timestat.message.handlers.MessageHandler;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

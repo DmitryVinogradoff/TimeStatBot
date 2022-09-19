@@ -30,6 +30,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Optional<Task> getById(Long id) { return taskRepository.findById(id); }
+
+    @Override
     public List<Task> getAllByIdUserTelegram(Long id) {
         return taskRepository.findAllByIdUserTelegram(id);
     }
@@ -43,6 +46,4 @@ public class TaskServiceImpl implements TaskService {
     public Task getLastAddedTask(Long id) {
         return taskRepository.findTopByIdUserTelegramOrderByIdDesc(id);
     }
-
-
 }

@@ -1,6 +1,7 @@
-package info.timestat.callbackqueryhandlers;
+package info.timestat.callbackquery.handlers;
 
 
+import info.timestat.callbackquery.LastCallbackQuery;
 import info.timestat.entity.Task;
 import info.timestat.entity.TimeTable;
 import info.timestat.histograms.Histogram;
@@ -38,6 +39,9 @@ public class CallbackQueryHandler {
     private long idUserTelegram;
 
     @Autowired
+    LastCallbackQuery lastCallbackQuery;
+
+    @Autowired
     CurrentState currentState;
 
     @Autowired
@@ -62,6 +66,7 @@ public class CallbackQueryHandler {
     }
 
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException, IOException {
+        lastCallbackQuery.setCallbackQuery(callbackQuery);
         this.callbackQuery = callbackQuery;
         idUserTelegram = callbackQuery.getFrom().getId();
         this.callback = callbackQuery.getData().split(":");
@@ -73,6 +78,7 @@ public class CallbackQueryHandler {
             case "about_menu" -> aboutMenu();
             case "add_task_menu" -> addTaskMenu();
             case "change_name" -> changeNameTask();
+            case "back_after_adding_menu" -> backAfterAddingMenu();
             case "delete_task_menu" -> deleteTaskMenu();
             case "tracking_task_menu" -> trackingTaskMenu();
             case "delete" -> deleteTask();
@@ -85,8 +91,6 @@ public class CallbackQueryHandler {
 
     private void aboutMenu() throws TelegramApiException {
         menu.editMenu(callbackQuery, menuText.getAboutBotMenuText(), keyboard.getBackToStartMenuKeyboard());
-        Task task = taskServiceImpl.getLastAddedTask(callbackQuery.getFrom().getId());
-        int k=0;
     }
 
     private void startMenu() throws TelegramApiException {
@@ -107,6 +111,14 @@ public class CallbackQueryHandler {
 
     private void changeNameTask() throws TelegramApiException{
         currentState.setState(State.RENAMETASK);
+        menu.editMenu(callbackQuery, menuText.getChangeTaskNameText(), keyboard.getChangeTaskNameKeyboard(Long.parseLong(callback[1])));
+    }
+
+    private void backAfterAddingMenu() throws TelegramApiException {
+        Optional<Task> task = taskServiceImpl.getById(Long.parseLong(callback[1]));
+        //не проверяем Optional, потому что редактировать хотели уже добавленную запись
+        menu.editMenu(callbackQuery, menuText.getAfterAddingTaskMenu(task.get().getName()), keyboard.getAfterAddingTaskKeyboard(Long.parseLong(callback[1])));
+        currentState.setState(State.DEFAULT);
     }
 
     private void statsTasksMenu() throws TelegramApiException {

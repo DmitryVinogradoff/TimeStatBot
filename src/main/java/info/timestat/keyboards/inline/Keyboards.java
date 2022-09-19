@@ -100,10 +100,10 @@ public class Keyboards {
         }
     }
 
-    public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(String text, long id) {
+    public List<List<InlineKeyboardButton>> getAfterAddingTaskKeyboard(long id) {
         buttonsData.clear();
         buttonsData.put("tracking:" + id, "Начать отслеживание");
-        buttonsData.put("change_name", "Исправить название задачи");
+        buttonsData.put("change_name:" + id, "Исправить название задачи");
         buttonsData.put("start_menu", "Главное меню");
         return keyboardGenerator(1);
     }
@@ -117,6 +117,12 @@ public class Keyboards {
     public List<List<InlineKeyboardButton>> getBackToAllStatsMenuKeyboard() {
         buttonsData.clear();
         buttonsData.put("stats_tasks_menu", "Назад");
+        return keyboardGenerator(1);
+    }
+
+    public List<List<InlineKeyboardButton>> getChangeTaskNameKeyboard(long idTask) {
+        buttonsData.clear();
+        buttonsData.put("back_after_adding_menu:" + idTask, "Назад");
         return keyboardGenerator(1);
     }
 }

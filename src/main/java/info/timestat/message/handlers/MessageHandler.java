@@ -1,5 +1,7 @@
-package info.timestat.messagehandlers;
+package info.timestat.message.handlers;
 
+import info.timestat.callbackquery.LastCallbackQuery;
+import info.timestat.message.LastMessage;
 import info.timestat.entity.Task;
 import info.timestat.keyboards.inline.Keyboards;
 import info.timestat.menu.Menu;
@@ -22,6 +24,12 @@ public class MessageHandler {
     private Menu menu;
     private MenuText menuText;
     private Keyboards keyboard;
+
+    @Autowired
+    LastMessage lastMessage;
+
+    @Autowired
+    LastCallbackQuery lastCallbackQuery;
 
     @Autowired
     CurrentState currentState;
@@ -77,17 +85,22 @@ public class MessageHandler {
             Optional<Task> optionalTask = taskServiceImpl.getByIdUserTelegramAndName(message.getFrom().getId(), text);
             if (!optionalTask.isPresent()) {
                 Task task = taskServiceImpl.save(new Task(text, message.getFrom().getId()));
-                menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(text, task.getId()));
+                menu.editMenu(message, menuText.getAfterAddingTaskMenu(text), keyboard.getAfterAddingTaskKeyboard(task.getId()));
             } else {
-                menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(text, optionalTask.get().getId()));
+                menu.editMenu(message, menuText.getTaskIsAlreadyPresentMenu(text), keyboard.getAfterAddingTaskKeyboard(optionalTask.get().getId()));
             }
             currentState.setState(State.DEFAULT);
+            menu.deleteMessage(message);
+            menu.deleteMessage(lastCallbackQuery.getCallbackQuery().getMessage());
         } else if (currentState.getState().equals(State.RENAMETASK)) {
             Task task = taskServiceImpl.getLastAddedTask(message.getFrom().getId());
             task.setName(message.getText());
             taskServiceImpl.save(task);
+            menu.editMenu(message, menuText.getAfterRenameTaskMenu(lastMessage.getMessage().getText(), text), keyboard.getAfterAddingTaskKeyboard(task.getId()));
             currentState.setState(State.DEFAULT);
+            menu.deleteMessage(message);
+            menu.deleteMessage(lastCallbackQuery.getCallbackQuery().getMessage());
         }
-
+        lastMessage.setMessage(message);
     }
 }

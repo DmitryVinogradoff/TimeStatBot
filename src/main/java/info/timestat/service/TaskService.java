@@ -12,4 +12,5 @@ public interface TaskService {
     List<Task> getAllByIdUserTelegram(Long id);
     Optional<Task> getByIdUserTelegramAndName(Long id, String name);
     Task getLastAddedTask(Long id);
+    Optional<Task> getById(Long id);
 }

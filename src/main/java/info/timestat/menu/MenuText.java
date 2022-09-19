@@ -3,7 +3,6 @@ package info.timestat.menu;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Iterator;
 import java.util.Map;
 
 @Component
@@ -78,5 +77,13 @@ public class MenuText {
 
     public String getTaskIsAlreadyPresentMenu(String taskName) {
         return "Задача <i><b>" + taskName + "</b></i> уже существует.\nЧтобы начать её отслеживание нажмите кнопку <i><b>«Начать отслеживание»</b></i>";
+    }
+
+    public String getChangeTaskNameText() {
+        return "Введите новое название задачи";
+    }
+
+    public String getAfterRenameTaskMenu(String oldTaskName, String newTaskName) {
+        return "Задача <i><b>" + oldTaskName + "</b></i> переименована в <i><b>" +newTaskName + "</b></i>.\nЧтобы начать её отслеживание нажмите кнопку <i><b>«Начать отслеживание»</b></i>";
     }
 }
