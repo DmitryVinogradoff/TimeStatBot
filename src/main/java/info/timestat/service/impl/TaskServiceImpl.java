@@ -26,7 +26,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void delete(Long id) {
-        taskRepository.deleteById(id);
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        optionalTask.get().setDel(true);
+        taskRepository.save(optionalTask.get());
+
     }
 
     @Override
@@ -34,7 +37,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getAllByIdUserTelegram(Long id) {
-        return taskRepository.findAllByIdUserTelegram(id);
+        return taskRepository.findByIdUserTelegramAndDel(id, false);
     }
 
     @Override

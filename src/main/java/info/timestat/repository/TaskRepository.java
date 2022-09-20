@@ -9,7 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository <Task, Long> {
-    List<Task> findAllByIdUserTelegram(Long id);
+    List<Task> findByIdUserTelegramAndDel(Long id, boolean isDel);
     Optional<Task> findByIdUserTelegramAndName(Long id, String name);
     Task findTopByIdUserTelegramOrderByIdDesc(Long id);
+
 }

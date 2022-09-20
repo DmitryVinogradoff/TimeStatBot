@@ -15,6 +15,9 @@ public class Task {
     @Column (name = "id_user_telegram")
     private long idUserTelegram;
 
+    @Column (name = "is_del")
+    private boolean del;
+
     public Task() { }
 
     public Task(String name, long idUserTelegram) {
@@ -45,4 +48,13 @@ public class Task {
     public long getIdUserTelegram() {
         return idUserTelegram;
     }
+
+    public boolean isDel() {
+        return del;
+    }
+
+    public void setDel(boolean del) {
+        this.del = del;
+    }
+
 }
