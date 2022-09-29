@@ -1,6 +1,6 @@
 logging.level.org.hibernate.SQL=DEBUG
 
-spring.datasource.url=jdbc:postgresql://address_to_db_server/db_name
+spring.datasource.url=jdbc:postgresql://address_to_db_server:port/db_name
 spring.datasource.username=username
 spring.datasource.password=password
 

@@ -30,6 +30,8 @@ services:
     restart: always
     depends_on:
       - postgres
+    networks:
+      - net
     working_dir: /app
     volumes:
       - type: bind
